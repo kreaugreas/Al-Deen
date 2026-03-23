@@ -1,0 +1,9 @@
+{
+  "id": "al-khayshum",
+  "name": "Al-Khayshum",
+  "arabicName": "الخيشوم",
+  "description": "The Nasal Cavity",
+  "rules": [
+    { "letter": "ن م (غنة)", "transliteration": "Ghunnah", "description": "Nasalization that accompanies Noon and Meem in certain conditions (Idgham, Ikhfa, Shaddah)", "example": "مِنْ نَارٍ", "exampleTranslation": "From fire" }
+  ]
+}

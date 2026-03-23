@@ -1,0 +1,15 @@
+{
+  "id": "before-leaving-home",
+  "name": "Before Leaving Home",
+  "arabicName": "عند الخروج من المنزل",
+  "icon": "door-open",
+  "description": "Dua to recite before leaving the home",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+      "translation": "In the name of Allah, I place my trust in Allah, and there is no might nor power except with Allah.",
+      "reference": "Abu Dawud"
+    }
+  ]
+}

@@ -1,0 +1,971 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&family=Amiri+Quran&family=Scheherazade+New:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Uthmani Regular (single file) === */
+@font-face {
+  font-family: 'Uthmani';
+  src: url('./Asset/Font/Quran/Uthmani/WOFF2.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Uthmani/TTF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Uthmani V1 - Page 1 (unicode-range based, pages 1-604) === */
+@font-face {
+  font-family: 'Uthmani V1';
+  src: url('./Asset/Font/Quran/Uthmani/KFGQPC/V1/Page/WOFF2/1.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V1/Page/WOFF/1.woff') format('woff'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V1/Page/TFF/1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Uthmani V2 - Page 1 (unicode-range based, pages 1-604) === */
+@font-face {
+  font-family: 'Uthmani V2';
+  src: url('./Asset/Font/Quran/Uthmani/KFGQPC/V2/Page/WOFF2/1.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V2/Page/WOFF/1.woff') format('woff'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V2/Page/TFF/1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Uthmani V4 - COLRv1 (primary for all themes, palette-switchable) === */
+@font-face {
+  font-family: 'Uthmani V4';
+  src: url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/COLRv1/WOFF2/1.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/COLRv1/WOFF/1.woff') format('woff'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/COLRv1/TTF/1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Uthmani V4 OT-SVG Light (Firefox/fallback, light mode) === */
+@font-face {
+  font-family: 'Uthmani V4 SVG Light';
+  src: url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/OT-SVG/Light/WOFF2/1.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/OT-SVG/Light/WOFF/1.woff') format('woff'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/OT-SVG/Light/TTF/1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Uthmani V4 OT-SVG Dark (Firefox/fallback, dark mode) === */
+@font-face {
+  font-family: 'Uthmani V4 SVG Dark';
+  src: url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/OT-SVG/Dark/WOFF2/1.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/OT-SVG/Dark/WOFF/1.woff') format('woff'),
+       url('./Asset/Font/Quran/Uthmani/KFGQPC/V4/Page/OT-SVG/Dark/TTF/1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === V4 dark mode font-palette: use palette index 1 (dark) === */
+@font-palette-values --v4-dark {
+  font-family: 'Uthmani V4';
+  base-palette: 1;
+}
+
+/* === IndoPak === */
+@font-face {
+  font-family: 'IndoPak';
+  src: url('./Asset/Font/Quran/Nastaleeq-IndoPak/WOFF2.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Nastaleeq-IndoPak/WOFF.woff') format('woff'),
+       url('./Asset/Font/Quran/Nastaleeq-IndoPak/TFF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Surah Names Font === */
+@font-face {
+  font-family: 'Surah';
+  src: url('./Asset/Font/Quran/Surah/WOFF2.woff2') format('woff2'),
+       url('./Asset/Font/Quran/Surah/WOFF.woff') format('woff'),
+       url('./Asset/Font/Quran/Surah/TTF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fallback Tajweed font - Color version A */
+@font-face {
+  font-family: 'KFGQPC HAFS Color A';
+  src: url('https://cdn.jsdelivr.net/gh/AbuYusof/Quran-Fonts-HAFS-Uthmanic-Colored-By-Tajweed-Ruls@main/Fonts/KFGQPC%20HAFS%20Uthmanic%20Script%20Color%20A.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/AbuYusof/Quran-Fonts-HAFS-Uthmanic-Colored-By-Tajweed-Ruls@main/Fonts/KFGQPC%20HAFS%20Uthmanic%20Script%20Color%20A.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/gh/AbuYusof/Quran-Fonts-HAFS-Uthmanic-Colored-By-Tajweed-Ruls@main/Fonts/KFGQPC%20HAFS%20Uthmanic%20Script%20Color%20A.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    /* Light Mode - Warm cream with 2% blue tint */
+    --background: 210 8% 94%;
+    --foreground: 210 5% 4%;
+
+    --card: 210 6% 98%;
+    --card-foreground: 210 5% 4%;
+
+    --popover: 210 6% 98%;
+    --popover-foreground: 210 5% 4%;
+
+    /* Green primary accent */
+    --primary: 152 60% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 6% 88%;
+    --secondary-foreground: 210 5% 6%;
+
+    --muted: 210 6% 86%;
+    --muted-foreground: 210 3% 25%;
+
+    --accent: 210 6% 88%;
+    --accent-foreground: 210 5% 6%;
+
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 8% 40%;
+    --input: 210 6% 50%;
+    --ring: 210 5% 25%;
+
+    --radius: 1rem;
+
+    /* iOS 26 Liquid Glass Tokens - Light Mode (neutral) */
+    --glass-bg: rgba(240, 240, 240, 0.55);
+    --glass-bg-elevated: rgba(245, 245, 245, 0.70);
+    --glass-bg-hover: rgba(248, 248, 248, 0.80);
+    --glass-border: rgba(0, 0, 0, 0.25);
+    --glass-border-subtle: rgba(0, 0, 0, 0.12);
+    --glass-shadow-inner: inset 2px 2px 0px -2px rgba(250, 250, 250, 0.98), inset 0 0 4px 1px rgba(245, 245, 245, 0.95);
+    --glass-shadow-outer: 0 8px 32px rgba(0, 0, 0, 0.10);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 6%;
+    --sidebar-primary: 0 0% 12%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 93%;
+    --sidebar-accent-foreground: 0 0% 6%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 0 0% 35%;
+
+    --sidebar-width: 400px;
+  }
+
+  .dark {
+    /* Dark Mode - Rich charcoal with 2% blue tint */
+    --background: 215 12% 6%;
+    --foreground: 210 5% 94%;
+
+    --card: 215 10% 10%;
+    --card-foreground: 210 5% 94%;
+
+    --popover: 215 10% 9%;
+    --popover-foreground: 210 5% 94%;
+
+    /* Green primary accent */
+    --primary: 152 55% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 8% 15%;
+    --secondary-foreground: 210 5% 94%;
+
+    --muted: 215 8% 13%;
+    --muted-foreground: 210 3% 58%;
+
+    --accent: 215 8% 15%;
+    --accent-foreground: 210 5% 94%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 10% 55%;
+    --input: 215 10% 50%;
+    --ring: 210 5% 50%;
+
+    /* iOS 26 Liquid Glass Tokens - Dark Mode (neutral) */
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glass-bg-elevated: rgba(255, 255, 255, 0.10);
+    --glass-bg-hover: rgba(255, 255, 255, 0.15);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --glass-border-subtle: rgba(255, 255, 255, 0.12);
+    --glass-shadow-inner: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.22), inset 0 0 3px 1px rgba(255, 255, 255, 0.12);
+    --glass-shadow-outer: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 0% 90%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 0 0% 50%;
+  }
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+@layer components {
+  .font-brand {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+  }
+
+  .font-heading {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  }
+
+  /* Quran Font Families */
+  
+  /* Uthmani Regular */
+  .font-uthmani {
+    font-family: 'Uthmani', 'Amiri', 'Traditional Arabic', serif;
+  }
+
+  /* Uthmani V1 - KFGQPC Page-based */
+  .font-uthmani_v1 {
+    font-family: 'Uthmani V1', 'Uthmani', 'Amiri', 'Traditional Arabic', serif;
+  }
+
+  /* Uthmani V2 - KFGQPC Page-based */
+  .font-uthmani_v2 {
+    font-family: 'Uthmani V2', 'Uthmani', 'Amiri', 'Traditional Arabic', serif;
+  }
+
+  /* Uthmani V4 - COLRv1 uses built-in palette for light mode, OT-SVG fallback for Firefox */
+  .font-uthmani_v4 {
+    font-family: 'Uthmani V4', 'Uthmani V4 SVG Light', 'Uthmani', 'Amiri', 'Traditional Arabic', serif;
+  }
+
+  /* Dark mode: use dark base-palette for COLRv1, swap SVG fallback to dark variant */
+  .dark .font-uthmani_v4 {
+    font-family: 'Uthmani V4', 'Uthmani V4 SVG Dark', 'Uthmani', 'Amiri', 'Traditional Arabic', serif;
+    font-palette: --v4-dark;
+  }
+
+  /* IndoPak - Nastaliq */
+  .font-indopak {
+    font-family: 'IndoPak', 'Scheherazade New', 'Amiri', serif;
+  }
+
+  /* Surah Names */
+  .font-surah {
+    font-family: 'Surah', 'Amiri', 'Traditional Arabic', serif;
+  }
+
+  /* Legacy aliases */
+  .font-arabic {
+    font-family: 'Uthmani', 'Amiri', 'Traditional Arabic', serif;
+  }
+
+  .font-uthmani_hafs {
+    font-family: 'Uthmani', 'Amiri', 'Traditional Arabic', serif;
+  }
+
+  /* Tajweed font */
+  .font-tajweed {
+    font-family: 'Uthmani', 'Amiri Quran', 'Amiri', 'Traditional Arabic', serif;
+    font-feature-settings: "calt" 1, "liga" 1, "kern" 1;
+    -webkit-font-feature-settings: "calt" 1, "liga" 1, "kern" 1;
+    -moz-font-feature-settings: "calt" 1, "liga" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Tajweed color coding */
+.tajweed-text tajweed { display: inline; }
+
+/* Silent / weak letters */
+.tajweed-text tajweed.ham_wasl       { color: #AAAAAA; } /* Silent Hamza */
+.tajweed-text tajweed.laam_shamsiyah { color: #AAAAAA; } /* Silent Laam */
+
+/* Madd (prolongation) */
+.tajweed-text tajweed.madda_normal       { color: #537FFF; } /* Normal madd 2 */
+.tajweed-text tajweed.madda_permissible  { color: #4050FF; } /* Separated madd 2/4/6 */
+.tajweed-text tajweed.madda_necessary    { color: #000EBC; } /* Necessary madd 6 */
+.tajweed-text tajweed.madda_obligatory   { color: #2144C1; } /* Connected madd 4/5 */
+
+/* Qalqala (echo) */
+.tajweed-text tajweed.qalaqala { color: #DD0008; }
+
+/* Ghunna (nasalization) */
+.tajweed-text tajweed.ghunnah         { color: #FF7E1E; }
+.tajweed-text tajweed.ikhpiaa         { color: #26BFFD; } /* Ikhfa */
+.tajweed-text tajweed.ikhpiaa_shafawi { color: #D500B7; } /* Ikhfa Shafawi */
+.tajweed-text tajweed.iqlab           { color: #26BFFD; } /* Iqlab */
+
+/* Idghaam (merging) */
+.tajweed-text tajweed.idghaam_ghunnah       { color: #169200; }
+.tajweed-text tajweed.idghaam_no_ghunnah    { color: #169200; }
+.tajweed-text tajweed.idghaam_shafawi       { color: #58B800; }
+.tajweed-text tajweed.idghaam_mutajanisayn  { color: #A1A1A1; }
+.tajweed-text tajweed.idghaam_mutaqaribayn  { color: #A1A1A1; }
+
+/* Tafkhim (heavy/emphatic) */
+.tajweed-text tajweed.tafkhim { color: #BB4F00; }
+
+/* Dark mode */
+.dark .tajweed-text tajweed.ham_wasl         { color: #888888; }
+.dark .tajweed-text tajweed.laam_shamsiyah   { color: #888888; }
+.dark .tajweed-text tajweed.madda_normal     { color: #7B9FFF; }
+.dark .tajweed-text tajweed.madda_permissible{ color: #6B7BFF; }
+.dark .tajweed-text tajweed.madda_necessary  { color: #5B6EFF; }
+.dark .tajweed-text tajweed.madda_obligatory { color: #5B78FF; }
+.dark .tajweed-text tajweed.qalaqala         { color: #FF4D4D; }
+.dark .tajweed-text tajweed.ghunnah          { color: #FFA44D; }
+.dark .tajweed-text tajweed.ikhpiaa          { color: #4DD4FF; }
+.dark .tajweed-text tajweed.ikhpiaa_shafawi  { color: #E64DCC; }
+.dark .tajweed-text tajweed.iqlab            { color: #4DD4FF; }
+.dark .tajweed-text tajweed.idghaam_ghunnah  { color: #2BBF0E; }
+.dark .tajweed-text tajweed.idghaam_no_ghunnah { color: #2BBF0E; }
+.dark .tajweed-text tajweed.idghaam_shafawi  { color: #7ADB26; }
+.dark .tajweed-text tajweed.idghaam_mutajanisayn { color: #C0C0C0; }
+.dark .tajweed-text tajweed.idghaam_mutaqaribayn { color: #C0C0C0; }
+.dark .tajweed-text tajweed.tafkhim          { color: #E07030; }
+
+  /* Liquid Glass Hover for non-glass buttons - NO SCALE */
+  .glass-hover {
+    @apply transition-all duration-200 rounded-xl;
+    position: relative;
+    color: hsl(var(--foreground));
+  }
+
+  .glass-hover:hover {
+    background: var(--glass-bg);
+    box-shadow: var(--glass-shadow-inner);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-hover:active {
+    opacity: 0.8;
+  }
+
+  /* ===== iOS 26 LIQUID GLASS SYSTEM ===== */
+
+  /* Glass Container - Main card/container style */
+  .glass-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px;
+  }
+
+  .glass-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 30px;
+    box-shadow: var(--glass-shadow-inner);
+  }
+
+  .glass-container::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 30px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    filter: url(#container-glass);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Glass Button */
+  .glass-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 12px 24px;
+    background: transparent;
+    border-radius: 9999px;
+    outline: none;
+    border: none;
+    z-index: 0;
+    transition: all 0.3s ease;
+    color: hsl(var(--foreground));
+    font-weight: 400;
+  }
+
+  .glass-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    box-shadow: var(--glass-shadow-inner);
+    background-color: rgb(255 255 255 / 10%);
+  }
+
+  .glass-btn::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 9999px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    filter: url(#btn-glass);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .glass-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .glass-btn:hover::before {
+    background-color: rgb(255 255 255 / 20%);
+  }
+
+  .glass-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Glass Icon Button */
+  .glass-icon-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    background: transparent;
+    border-radius: 9999px;
+    outline: none;
+    border: none;
+    z-index: 0;
+    transition: all 0.3s ease;
+    color: hsl(var(--foreground));
+  }
+
+  .glass-icon-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    box-shadow: var(--glass-shadow-inner);
+    background-color: rgb(255 255 255 / 10%);
+  }
+
+  .glass-icon-btn::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 9999px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    filter: url(#btn-glass);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .glass-icon-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .glass-icon-btn:hover::before {
+    background-color: rgb(255 255 255 / 20%);
+  }
+
+  .glass-icon-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Glass Card */
+  .glass-card {
+    position: relative;
+    border-radius: 24px;
+    padding: 20px;
+    background: transparent;
+  }
+.glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow-inner);
+    pointer-events: none;
+  }
+
+  .glass-card::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 24px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    filter: url(#container-glass);
+    overflow: hidden;
+    isolation: isolate;
+    pointer-events: none;
+  }
+
+  /* Glass Navbar - Full width floating without outline */
+  .glass-navbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 8px 12px;
+    background: transparent;
+    width: 100%;
+    max-width: calc(100vw - 2rem);
+  }
+
+  @media (min-width: 640px) {
+    .glass-navbar {
+      padding: 8px 16px;
+      max-width: calc(100vw - 3rem);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .glass-navbar {
+      padding: 8px 20px;
+      max-width: calc(100vw - 4rem);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .glass-navbar {
+      max-width: 1000px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .glass-navbar {
+      max-width: 1200px;
+    }
+  }
+
+  .glass-navbar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    box-shadow: var(--glass-shadow-inner);
+    background-color: var(--glass-bg);
+  }
+
+  .glass-navbar::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 9999px;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Glass Sidebar - with backdrop blur for readability */
+  .glass-sidebar {
+    position: relative;
+    background: hsl(var(--background) / 0.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+
+  .glass-sidebar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    box-shadow: var(--glass-shadow-inner);
+    pointer-events: none;
+  }
+
+  .glass-sidebar::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: hsl(var(--background) / 0.7);
+    overflow: hidden;
+    isolation: isolate;
+    pointer-events: none;
+  }
+
+  /* Glass Input/Search */
+  .glass-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: 9999px;
+    background: transparent;
+  }
+
+  .glass-input::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    box-shadow: var(--glass-shadow-inner);
+    background-color: rgb(255 255 255 / 5%);
+  }
+
+  .glass-input::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 9999px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    filter: url(#input-glass);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .glass-input input {
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 14px 20px;
+    color: hsl(var(--foreground));
+    position: relative;
+    z-index: 1;
+  }
+
+  .glass-input input::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Glass Toggle/Switch */
+  .glass-toggle {
+    position: relative;
+    width: 52px;
+    height: 32px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .glass-toggle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    box-shadow: var(--glass-shadow-inner);
+    background-color: rgb(255 255 255 / 10%);
+  }
+
+  .glass-toggle::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 9999px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    filter: url(#btn-glass);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Glass Dropdown - with solid background for visibility */
+  .glass-dropdown {
+    position: relative;
+    border-radius: 16px;
+    padding: 4px;
+    background: hsl(var(--background) / 0.95);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .glass-dropdown::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow-inner);
+    pointer-events: none;
+  }
+
+  .glass-dropdown::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 16px;
+    background: hsl(var(--background) / 0.8);
+    overflow: hidden;
+    isolation: isolate;
+    pointer-events: none;
+  }
+
+  /* Legacy glass classes for backwards compatibility */
+  .glass {
+    @apply glass-card;
+  }
+
+  .glass-elevated {
+    @apply glass-container;
+  }
+
+  .glass-subtle {
+    @apply glass-card;
+  }
+
+  .btn-glass {
+    @apply glass-btn;
+  }
+
+  /* Glass Hover Effect for non-glass buttons */
+  .glass-hover {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .glass-hover:hover {
+    transform: scale(1.02);
+  }
+
+  .glass-hover:hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: inherit;
+    box-shadow: var(--glass-shadow-inner);
+    background-color: rgb(255 255 255 / 15%);
+  }
+
+  .glass-hover:hover::after {
+    content: '';
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    border-radius: inherit;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    filter: url(#btn-glass);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Content wrapper for proper z-index */
+  .glass-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* iOS-style Navigation Card */
+  .nav-card {
+    @apply glass-card cursor-pointer transition-all duration-300 ease-out;
+  }
+
+  .nav-card:hover {
+    transform: scale(1.02);
+  }
+
+  .nav-card:active {
+    transform: scale(0.98);
+  }
+
+  /* iOS-style Surah Card */
+  .surah-card {
+    @apply glass-card cursor-pointer transition-all duration-200;
+  }
+
+  .surah-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .surah-card:active {
+    transform: scale(0.98);
+  }
+
+  /* iOS-style Icon Container */
+  .icon-container {
+    @apply flex items-center justify-center rounded-xl;
+    background: hsl(var(--primary) / 0.1);
+  }
+
+  /* Smooth transitions */
+  .smooth-transition {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  /* Glass Tooltip */
+  .glass-tooltip {
+    position: relative;
+    border-radius: 12px;
+    padding: 8px 12px;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 400;
+    color: hsl(var(--foreground));
+  }
+
+  .glass-tooltip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow-inner);
+    background-color: rgb(255 255 255 / 15%);
+  }
+
+  .glass-tooltip::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 12px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    filter: url(#btn-glass);
+    overflow: hidden;
+    isolation: isolate;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 100vw;
+  }
+  
+  .glass-navbar {
+    padding: 6px 12px;
+    max-width: calc(100vw - 1rem);
+  }
+  
+  .glass-btn {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  
+  .glass-icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --sidebar-width: 100vw;
+  }
+  
+  .glass-card {
+    padding: 16px;
+    border-radius: 20px;
+  }
+  
+  .glass-container {
+    border-radius: 24px;
+  }
+  
+  .glass-container::before,
+  .glass-container::after {
+    border-radius: 24px;
+  }
+  
+  .glass-navbar {
+    max-width: calc(100vw - 0.5rem);
+    left: 0.25rem;
+    right: 0.25rem;
+  }
+}
+
+/* Word audio highlight animation */
+@keyframes word-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+}
+
+.word-playing {
+  animation: word-pulse 0.8s ease-in-out infinite;
+}
+
+/* Safe area padding for mobile devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

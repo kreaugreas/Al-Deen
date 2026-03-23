@@ -1,0 +1,9 @@
+{
+  "id": "makharij",
+  "name": "Makharij",
+  "arabicName": "مخارج الحروف",
+  "description": "Articulation Points — where each Arabic letter originates in the mouth and throat",
+  "icon": "mic",
+  "color": "#e74c3c",
+  "subcategories": ["al-jawf", "al-halq", "al-lisan", "ash-shafatan", "al-khayshum"]
+}

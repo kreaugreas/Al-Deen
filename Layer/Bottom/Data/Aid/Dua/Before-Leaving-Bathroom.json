@@ -1,0 +1,15 @@
+{
+  "id": "leaving-bathroom",
+  "name": "Leaving Bathroom",
+  "arabicName": "عند الخروج من الخلاء",
+  "icon": "door-open",
+  "description": "Dua to recite after leaving the bathroom",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "غُفْرَانَكَ",
+      "translation": "I seek Your forgiveness.",
+      "reference": "Abu Dawud & Tirmidhi"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "after-eating",
+  "name": "After Eating",
+  "arabicName": "بعد الأكل",
+  "icon": "utensils",
+  "description": "Dua to recite after eating",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
+      "translation": "All praise is due to Allah who fed us and gave us drink and made us Muslims.",
+      "reference": "Abu Dawud"
+    }
+  ]
+}

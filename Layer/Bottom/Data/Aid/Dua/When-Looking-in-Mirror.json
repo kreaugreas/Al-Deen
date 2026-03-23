@@ -1,0 +1,15 @@
+{
+  "id": "looking-in-mirror",
+  "name": "Looking in the Mirror",
+  "arabicName": "عند النظر في المرآة",
+  "icon": "sparkles",
+  "description": "Dua to recite when looking in the mirror",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "اللَّهُمَّ أَنْتَ حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي",
+      "translation": "O Allah, just as You have made my outward appearance beautiful, make my character beautiful too.",
+      "reference": "Ahmad"
+    }
+  ]
+}

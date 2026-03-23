@@ -1,0 +1,15 @@
+{
+  "id": "upon-waking-up",
+  "name": "Upon Waking Up",
+  "arabicName": "عند الاستيقاظ",
+  "icon": "sunrise",
+  "description": "Duas to recite upon waking from sleep",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+      "translation": "All praise is due to Allah who gave us life after causing us to die, and to Him is the resurrection.",
+      "reference": "Bukhari"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "entering-home",
+  "name": "Entering Home",
+  "arabicName": "عند دخول المنزل",
+  "icon": "home",
+  "description": "Dua to recite when entering the home",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا",
+      "translation": "O Allah, I ask You for the good of entering and the good of leaving. In the name of Allah we enter, in the name of Allah we leave, and upon Allah our Lord we place our trust.",
+      "reference": "Abu Dawud"
+    }
+  ]
+}

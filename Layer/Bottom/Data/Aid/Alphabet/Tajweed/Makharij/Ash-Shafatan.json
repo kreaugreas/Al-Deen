@@ -1,0 +1,10 @@
+{
+  "id": "ash-shafatan",
+  "name": "Ash-Shafatan",
+  "arabicName": "الشفتان",
+  "description": "The Two Lips",
+  "rules": [
+    { "letter": "ف", "transliteration": "Fa", "description": "Inner lower lip touching the edge of the upper front teeth", "example": "فَضْلٌ", "exampleTranslation": "Bounty" },
+    { "letter": "ب م و", "transliteration": "Ba, Mim, Waw", "description": "Both lips coming together (Ba/Mim) or rounding (Waw)", "example": "بِسْمِ", "exampleTranslation": "In the name of" }
+  ]
+}

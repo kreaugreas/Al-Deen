@@ -1,0 +1,15 @@
+{
+  "id": "after-wudu",
+  "name": "After Wudu",
+  "arabicName": "بعد الوضوء",
+  "icon": "droplets",
+  "description": "Dua to recite after performing wudu",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ",
+      "translation": "I bear witness that there is no god worthy of worship except Allah alone, with no partner, and I bear witness that Muhammad is His servant and messenger. O Allah, make me among those who repent and make me among those who purify themselves.",
+      "reference": "Muslim"
+    }
+  ]
+}

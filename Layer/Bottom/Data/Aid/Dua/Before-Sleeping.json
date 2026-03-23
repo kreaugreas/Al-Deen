@@ -1,0 +1,15 @@
+{
+  "id": "sleep",
+  "name": "Sleep",
+  "arabicName": "النوم",
+  "icon": "moon",
+  "description": "Duas to recite before sleeping and upon waking",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
+      "translation": "O Allah, in Your name I die and I live.",
+      "reference": "Bukhari"
+    }
+  ]
+}

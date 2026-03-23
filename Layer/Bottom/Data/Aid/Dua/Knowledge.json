@@ -1,0 +1,15 @@
+{
+  "id": "knowledge",
+  "name": "Knowledge",
+  "arabicName": "العلم",
+  "icon": "book-open",
+  "description": "Duas for seeking knowledge and understanding",
+  "duas": [
+    {
+      "id": 1,
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "translation": "My Lord, increase me in knowledge.",
+      "reference": "Quran 20:114"
+    }
+  ]
+}
