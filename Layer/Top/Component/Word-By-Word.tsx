@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useApp } from "@/Middle/Context/App-Context";
-import { useAudio } from "@/Middle/Context/Audio-Context";
+import { useApp } from "@/Middle/Context/App";
+import { useAudio } from "@/Middle/Context/Audio";
 import { getWordAudioUrl, getAyahAudioUrl } from "@/Bottom/API/Quran";
 
 const VERSE_INDICATOR_RE = /^[\u0660-\u0669\u06F0-\u06F9\u06DD۝\s]+$/;

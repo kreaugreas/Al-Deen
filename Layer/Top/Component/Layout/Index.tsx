@@ -1,0 +1,28 @@
+import { ReactNode, lazy, Suspense } from "react";
+import { Header } from "@/Top/Component/Layout/Header";
+import { PageTransition } from "@/Top/Component/Page-Transition";
+
+const SettingsSidebar = lazy(() => import("@/Top/Component/Settings/Sidebar").then(m => ({ default: m.SettingsSidebar })));
+const SpotlightSearch = lazy(() => import("@/Top/Component/Search").then(m => ({ default: m.SpotlightSearch })));
+
+interface LayoutProps {
+  children: ReactNode;
+  hideFooter?: boolean;
+}
+
+export function Layout({ children, hideFooter = false }: LayoutProps) {
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+      <PageTransition>
+        <main className="flex-1 pt-20 md:pt-20 px-2 sm:px-4 pb-6">
+          {children}
+        </main>
+      </PageTransition>
+      <Suspense fallback={null}>
+        <SettingsSidebar />
+        <SpotlightSearch />
+      </Suspense>
+    </div>
+  );
+}

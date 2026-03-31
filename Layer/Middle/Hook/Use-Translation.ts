@@ -1,4 +1,4 @@
-import { useApp } from "@/Middle/Context/App-Context";
+import { useApp } from "@/Middle/Context/App";
 import { getTranslation, isRtlLanguage, TranslationKeys } from "@/Middle/I18n";
 
 export function useTranslation() {

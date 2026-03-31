@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { Layout } from "@/Top/Component/Layout/Layout";
+import { Layout } from "@/Top/Component/Layout/Index";
 import { getLetter } from "@/Bottom/API/Aid";
 import { ChevronRight } from "lucide-react";
 

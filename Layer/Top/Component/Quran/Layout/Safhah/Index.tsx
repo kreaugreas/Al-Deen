@@ -1,10 +1,12 @@
 // Layer/Top/Component/Quran/Layout/Safhah/Index.tsx
 import React, { useMemo, useState } from "react";
 import { WordByWord } from "@/Top/Component/Word-By-Word";
-import { useAudio } from "@/Middle/Context/Audio-Context";
+import { useAudio } from "@/Middle/Context/Audio";
 import { PageLines } from "./Main";
 import type { PageViewProps, ResolvedWord } from "./Types";
 import type { AssembledVerse } from "@/Bottom/API/Quran";
+import { getPageSegments } from "@/Bottom/API/Quran";
+import { Container } from "@/Top/Component/UI/Container";
 
 export function PageView({
   surah,
@@ -21,18 +23,40 @@ export function PageView({
   const { activeVerse, activeWord } = useAudio();
   const [hoveredVerse, setHoveredVerse] = useState<number | null>(null);
 
+  // Get actual page segments from the page map
   const pages = useMemo(() => {
     const startPage = surah.pages[0];
     const endPage = surah.pages[1];
-    const totalPages = endPage - startPage + 1;
-    const versesPerPage = Math.ceil(verses.length / totalPages);
     const result: { pageNumber: number; verses: AssembledVerse[] }[] = [];
-
-    for (let i = 0; i < totalPages; i++) {
-      const pageVerses = verses.slice(i * versesPerPage, (i + 1) * versesPerPage);
-      if (pageVerses.length > 0) result.push({ pageNumber: startPage + i, verses: pageVerses });
+    
+    // Create a map for quick verse lookup
+    const verseMap = new Map<number, AssembledVerse>();
+    for (const verse of verses) {
+      verseMap.set(verse.verseNumber, verse);
     }
-
+    
+    for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
+      const segments = getPageSegments(pageNum);
+      if (!segments) continue;
+      
+      // Find the segment that belongs to this surah
+      const surahSegment = segments.find(seg => seg.surah === surah.id);
+      if (!surahSegment) continue;
+      
+      // Collect all verses from startVerse to endVerse
+      const pageVerses: AssembledVerse[] = [];
+      for (let verseNum = surahSegment.startVerse; verseNum <= surahSegment.endVerse; verseNum++) {
+        const verse = verseMap.get(verseNum);
+        if (verse) {
+          pageVerses.push(verse);
+        }
+      }
+      
+      if (pageVerses.length > 0) {
+        result.push({ pageNumber: pageNum, verses: pageVerses });
+      }
+    }
+    
     return result;
   }, [surah, verses]);
 
@@ -85,10 +109,10 @@ export function PageView({
   }, [pages, resolvedLines]);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6">
       {pages.map((page, pageIdx) => (
-        <div key={page.pageNumber} className="glass-container !rounded-xl overflow-hidden !block">
-          <div className="pt-4 px-6 sm:px-8 pb-0">
+        <Container key={page.pageNumber}>
+          <div className="pt-4 px-6 sm:px-6 pb-0">
             {showArabicText && (
               lines ? (
                 <PageLines
@@ -167,11 +191,14 @@ export function PageView({
               </div>
             )}
           </div>
-
-          <div className="flex items-center justify-center pt-1 pb-2">
-            <span className="text-xs text-muted-foreground">{page.pageNumber}</span>
+          
+          {/* Page number at bottom of container */}
+          <div className="flex items-center justify-center pt-4 pb-2 mt-2">
+            <span className="text-sm text-muted-foreground font-medium">
+              {page.pageNumber}
+            </span>
           </div>
-        </div>
+        </Container>
       ))}
     </div>
   );

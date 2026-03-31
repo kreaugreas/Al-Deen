@@ -1,8 +1,8 @@
 // Layer/Top/Component/Quran/Layout/Safhah/Utility.tsx
-import React, { useState, useRef } from "react";
-import { createPortal } from "react-dom";
+import React, { useRef } from "react";
 import { getWordAudioUrl, getAyahAudioUrl } from "@/Bottom/API/Quran";
-import { useApp } from "@/Middle/Context/App-Context";
+import { useApp } from "@/Middle/Context/App";
+import { Tooltip } from "@/Top/Component/UI/Tooltip";
 import type { WordTooltipProps } from "./Types";
 
 export function WordTooltip({ 
@@ -13,56 +13,23 @@ export function WordTooltip({
   onMouseLeave, 
   children 
 }: WordTooltipProps) {
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
-
-  if (!enabled) {
-    return <>{children}</>;
-  }
-
-  const tooltip = translation && pos
-    ? createPortal(
-        <span
-          style={{
-            position: "fixed",
-            left: pos.x,
-            top: pos.y - 8,
-            transform: "translate(-50%, -100%)",
-            zIndex: 9999,
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
-          }}
-          className="glass-tooltip rounded px-2 py-1 text-sm font-medium shadow-lg"
-          dir="ltr"
-        >
-          {translation}
-        </span>,
-        document.body,
-      )
-    : null;
-
   return (
-    <span
-      style={{ position: "relative", display: "inline" }}
-      onClick={onClick}
-      onMouseEnter={(e) => {
-        const r = e.currentTarget.getBoundingClientRect();
-        setPos({ x: r.left + r.width / 2, y: r.top });
-        onMouseEnter?.();
-      }}
-      onMouseLeave={() => {
-        setPos(null);
-        onMouseLeave?.();
-      }}
-    >
-      {children}
-      {tooltip}
-    </span>
+    <Tooltip content={translation} enabled={enabled} side="top" offset={20}>
+      <span
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        style={{ display: "inline" }}
+      >
+        {children}
+      </span>
+    </Tooltip>
   );
 }
 
 export function useAudioPlayback(surahId: number) {
   const { hoverRecitation, selectedReciter } = useApp();
-  const [playingKey, setPlayingKey] = useState<string | null>(null);
+  const [playingKey, setPlayingKey] = React.useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const playAudio = (url: string, key: string) => {
@@ -118,4 +85,4 @@ export const extractVerseNumberFromMarker = (glyph: string): number | null => {
   }
   const num = parseInt(glyph, 10);
   return isNaN(num) ? null : num;
-};
+}

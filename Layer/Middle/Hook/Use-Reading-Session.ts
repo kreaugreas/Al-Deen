@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/Bottom/Integration/Supabase/client";
-import { useAuth } from "@/Middle/Context/Auth-Context";
+import { useAuth } from "@/Middle/Context/Auth";
 
 /**
  * Tracks reading time on Quran pages using time-on-page + scroll activity.

@@ -1,17 +1,17 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { Layout } from "@/Top/Component/Layout/Layout";
+import { Layout } from "@/Top/Component/Layout/Index";
 import { SurahNavbar } from "@/Top/Component/Surah/Navbar";
 import { SurahNavigation } from "@/Top/Component/Surah/Navigation";
-import { AudioPlayer } from "@/Top/Component/Audio-Player";
+import { AudioPlayer } from "@/Top/Component/Audio-Player/Index";
 import { SurahHeader } from "@/Top/Component/Quran/Surah/Header";
 import { PageView } from "@/Top/Component/Quran/Layout/Safhah/Index";
 import { AyahView } from "@/Top/Component/Quran/Layout/Ayah/Index";
 import { NotesDialog } from "@/Top/Component/Dialog/Notes-Dialog";
 import { ShareDialog } from "@/Top/Component/Dialog/Share-Dialog";
 import { SurahInfoDialog } from "@/Top/Component/Dialog/Surah-Info-Dialog";
-import { surahList, juzData } from "@/Bottom/API/Quran";
-import { useApp } from "@/Middle/Context/App-Context";
-import { useAudio } from "@/Middle/Context/Audio-Context";
+import { surahList, juzData, type AssembledVerse } from "@/Bottom/API/Quran";
+import { useApp } from "@/Middle/Context/App";
+import { useAudio } from "@/Middle/Context/Audio";
 import { useQuranData } from "@/Middle/Hook/Use-Quran-Data";
 import { useReadingProgress } from "@/Middle/Hook/Use-Reading-Progress";
 import { useReadingSession } from "@/Middle/Hook/Use-Reading-Session";
@@ -48,8 +48,17 @@ const SurahIndex = () => {
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [surahInfoDialog, setSurahInfoDialog] = useState(false);
-  const [notesDialog, setNotesDialog] = useState<{ open: boolean; ayahId?: number; verseText?: string }>({ open: false });
-  const [shareDialog, setShareDialog] = useState<{ open: boolean; ayahId?: number; verseText?: string; translation?: string }>({ open: false });
+  const [notesDialog, setNotesDialog] = useState<{ 
+    open: boolean; 
+    ayahId?: number; 
+    verse?: AssembledVerse; // Add verse object to state
+  }>({ open: false });
+  const [shareDialog, setShareDialog] = useState<{ 
+    open: boolean; 
+    ayahId?: number; 
+    verseText?: string; 
+    translation?: string 
+  }>({ open: false });
 
   const verseRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const containerRef = useRef<HTMLDivElement>(null);
@@ -105,7 +114,7 @@ const SurahIndex = () => {
         if (activeGoal && minutes > 0) saveMinutesToGoal(activeGoal.id, minutes);
       });
     };
-  }, [surahId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [surahId]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -123,11 +132,6 @@ const SurahIndex = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [surahId, targetVerse, verses, isLoading]);
-
-  const wordCount = useMemo(() => {
-    if (!verses) return 0;
-    return verses.reduce((sum, verse) => sum + verse.words.length, 0);
-  }, [verses]);
 
   // Loading state
   if (isLoading) {
@@ -226,47 +230,52 @@ const SurahIndex = () => {
         isAudioPlaying={isPlaying}
       />
 
-      <div ref={containerRef} className="container pt-28 max-w-4xl mx-auto pb-24">
-        <SurahHeader
-          surah={surah}
-          wordCount={wordCount}
-          showBismillah={surahId !== 1 && surahId !== 9 && showArabicText}
-          fontClass={getFontClass()}
-          arabicFontSize={arabicFontSize}
-          onInfoClick={() => setSurahInfoDialog(true)}
-          onAudioClick={() => setShowAudioPlayer(true)}
-        />
-
-        {isPageLayout ? (
-          <PageView
+      <div ref={containerRef} className="pt-28 pb-24">
+        <div className="container max-w-4xl mx-auto space-y-6">
+          <SurahHeader
             surah={surah}
-            assembledSurah={surahData}
-            showArabicText={showArabicText}
-            hoverTranslation={hoverTranslation}
+            showBismillah={surahId !== 1 && surahId !== 9 && showArabicText}
             fontClass={getFontClass()}
             arabicFontSize={arabicFontSize}
-            translationFontSize={translationFontSizeValue}
-            verseRefs={verseRefs}
+            onInfoClick={() => setSurahInfoDialog(true)}
+            onAudioClick={() => setShowAudioPlayer(true)}
           />
-        ) : (
-          <AyahView
-            surah={surah}
-            verses={verses}
-            showArabicText={showArabicText}
-            verseTranslation={verseTranslation}
-            inlineTranslation={inlineTranslation}
-            translationFontSize={translationFontSizeValue}
-            targetVerse={targetVerse}
-            verseRefs={verseRefs}
-            onNotesClick={(ayahId, verseText) => setNotesDialog({ open: true, ayahId, verseText })}
-            onShareClick={(ayahId, verseText, translation) => setShareDialog({ open: true, ayahId, verseText, translation })}
-          />
-        )}
 
-        <SurahNavigation 
-          currentSurahId={surahId} 
-          totalVerses={surah.numberOfAyahs}
-        />
+          {isPageLayout ? (
+            <PageView
+              surah={surah}
+              assembledSurah={surahData}
+              showArabicText={showArabicText}
+              hoverTranslation={hoverTranslation}
+              fontClass={getFontClass()}
+              arabicFontSize={arabicFontSize}
+              translationFontSize={translationFontSizeValue}
+              verseRefs={verseRefs}
+            />
+          ) : (
+            <AyahView
+              surah={surah}
+              verses={verses}
+              showArabicText={showArabicText}
+              verseTranslation={verseTranslation}
+              inlineTranslation={inlineTranslation}
+              translationFontSize={translationFontSizeValue}
+              targetVerse={targetVerse}
+              verseRefs={verseRefs}
+              onNotesClick={(ayahId, verseText) => {
+                // Find the verse object and pass it
+                const verse = verses.find(v => v.verseNumber === ayahId);
+                setNotesDialog({ open: true, ayahId, verse });
+              }}
+              onShareClick={(ayahId, verseText, translation) => setShareDialog({ open: true, ayahId, verseText, translation })}
+            />
+          )}
+
+          <SurahNavigation 
+            currentSurahId={surahId} 
+            totalVerses={surah.numberOfAyahs}
+          />
+        </div>
       </div>
 
       <AudioPlayer
@@ -283,9 +292,8 @@ const SurahIndex = () => {
         open={notesDialog.open}
         onOpenChange={(open) => setNotesDialog({ ...notesDialog, open })}
         surahId={surahId}
-        surahName={surah.englishName}
         ayahId={notesDialog.ayahId}
-        verseText={notesDialog.verseText}
+        verse={notesDialog.verse}
       />
       
       <ShareDialog

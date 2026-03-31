@@ -12,7 +12,7 @@ import {
 import { surahList, juzData } from "@/Bottom/API/Quran";
 import { hadithCollections } from "@/Bottom/API/Hadith";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
-import { useApp } from "@/Middle/Context/App-Context";
+import { useApp } from "@/Middle/Context/App";
 import { cn } from "@/Middle/Library/utils";
 import { useIsMobile } from "@/Middle/Hook/Use-Mobile";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";

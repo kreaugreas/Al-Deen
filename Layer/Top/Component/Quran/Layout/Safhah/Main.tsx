@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from "react";
 import { useMediaQuery } from "@/Middle/Hook/Use-Media-Query";
-import { useApp } from "@/Middle/Context/App-Context";
-import { useAudio } from "@/Middle/Context/Audio-Context";
+import { useApp } from "@/Middle/Context/App";
+import { useAudio } from "@/Middle/Context/Audio";
 import { WordTooltip, useAudioPlayback, extractVerseNumberFromMarker } from "./Utility";
 import type { PageLinesProps } from "./Types";
 

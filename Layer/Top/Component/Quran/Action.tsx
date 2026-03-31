@@ -1,6 +1,6 @@
 import { Info, Play, Pause, Loader2 } from "lucide-react";
 import { TooltipProvider } from "@/Top/Component/UI/tooltip";
-import { useAudio } from "@/Middle/Context/Audio-Context";
+import { useAudio } from "@/Middle/Context/Audio";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 
 interface ActionsProps {

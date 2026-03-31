@@ -1,13 +1,15 @@
 import { useParams, Link } from "react-router-dom";
-import { Layout } from "@/Top/Component/Layout/Layout";
+import { Layout } from "@/Top/Component/Layout/Index";
 import { Copy, Share2, BookmarkPlus, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
 import { getCollection, getChapter, getChaptersByCollection } from "@/Bottom/API/Hadith";
 import { toast } from "@/Middle/Hook/Use-Toast";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { useBookmarks } from "@/Middle/Hook/Use-Bookmarks";
-import { useAuth } from "@/Middle/Context/Auth-Context";
+import { useAuth } from "@/Middle/Context/Auth";
+import { Card } from "@/Top/Component/UI/Card";
+import { Button } from "@/Top/Component/UI/Button";
 
-const HadithChapter = () => {
+const Hadith_Chapter = () => {
   const { collectionId, chapterId } = useParams<{ collectionId: string; chapterId: string }>();
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -45,13 +47,13 @@ const HadithChapter = () => {
   if (!collection || !chapter) {
     return (
       <Layout>
-        <div className="container py-16 text-center">
-          <div className="glass-card max-w-md mx-auto p-8">
+        <div className="py-16 text-center">
+          <Card className="max-w-md mx-auto p-8">
             <h1 className="text-2xl font-semibold mb-4">Chapter Not Found</h1>
-            <Link to="/Hadiths" className="text-primary hover:underline">
-              {t.common.back} to {t.hadiths.title}
+            <Link to="/Hadith">
+              <Button>{t.common.back} to {t.hadiths.title}</Button>
             </Link>
-          </div>
+          </Card>
         </div>
       </Layout>
     );
@@ -84,99 +86,103 @@ const HadithChapter = () => {
 
   return (
     <Layout>
-      <section className="py-6">
-        <div className="container max-w-4xl">
-          <nav className="flex items-center gap-1.5 text-sm mb-6 flex-wrap">
-            <Link to="/Hadiths" className="text-muted-foreground hover:text-foreground transition-colors">
-              {t.hadiths.title}
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <Link to={`/Hadiths/${collectionId}`} className="text-muted-foreground hover:text-foreground transition-colors">
-              {collection.name}
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-foreground font-medium">{chapter.name}</span>
-          </nav>
+      <div className="max-w-4xl mx-auto">
+        <Card className="p-6 mb-6">
+          <h1 className="text-2xl font-bold">{chapter.name}</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {chapter.hadithCount} hadiths • {chapter.hadithRange}
+          </p>
+        </Card>
 
-          {chapter.hadiths.length === 0 ? (
-            <div className="glass-card p-8 text-center">
-              <p className="text-muted-foreground">No hadiths found in this chapter.</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {chapter.hadiths.map((hadith) => {
-                const bookmarked = isHadithBookmarked(hadith.id);
-                return (
-                  <div key={hadith.id} className="glass-card p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center justify-center w-8 h-8 glass-btn text-primary text-sm font-semibold">
-                          {hadith.id}
-                        </span>
-                        <span className="text-sm text-muted-foreground">{hadith.reference}</span>
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${getGradeColor(hadith.grade)}`}>
-                          {hadith.grade}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          className="glass-icon-btn w-8 h-8"
-                          onClick={() => handleCopy(`${hadith.arabic}\n\n${hadith.translation}`)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </button>
-                        <button className="glass-icon-btn w-8 h-8" onClick={() => handleShare(hadith)}>
-                          <Share2 className="h-4 w-4" />
-                        </button>
-                        <button
-                          className={`glass-icon-btn w-8 h-8 ${bookmarked ? "text-primary" : ""}`}
-                          onClick={() => handleBookmark(hadith.id, hadith.reference)}
-                        >
-                          {bookmarked ? <Bookmark className="h-4 w-4 fill-current" /> : <BookmarkPlus className="h-4 w-4" />}
-                        </button>
-                      </div>
+        {chapter.hadiths.length === 0 ? (
+          <Card className="p-8 text-center">
+            <p className="text-muted-foreground">No hadiths found in this chapter.</p>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {chapter.hadiths.map((hadith) => {
+              const bookmarked = isHadithBookmarked(hadith.id);
+              return (
+                <Card key={hadith.id} className="p-6 group">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <Button
+                        size="sm"
+                        className="w-8 h-8 rounded-full p-0 flex items-center justify-center"
+                      >
+                        {hadith.id}
+                      </Button>
+                      <span className="text-sm text-muted-foreground group-hover:text-white dark:group-hover:text-black">
+                        {hadith.reference}
+                      </span>
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${getGradeColor(hadith.grade)}`}>
+                        {hadith.grade}
+                      </span>
                     </div>
-
-                    <p className="font-arabic text-2xl text-right mb-4 leading-loose" dir="rtl">
-                      {hadith.arabic}
-                    </p>
-                    <p className="text-lg mb-3">{hadith.translation}</p>
-                    {hadith.narrator && (
-                      <p className="text-sm text-muted-foreground">
-                        Narrated by: <span className="font-medium">{hadith.narrator}</span>
-                      </p>
-                    )}
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        className="w-8 h-8 p-0"
+                        onClick={() => handleCopy(`${hadith.arabic}\n\n${hadith.translation}`)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="w-8 h-8 p-0"
+                        onClick={() => handleShare(hadith)}
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        className={`w-8 h-8 p-0 ${bookmarked ? "text-primary" : ""}`}
+                        onClick={() => handleBookmark(hadith.id, hadith.reference)}
+                      >
+                        {bookmarked ? <Bookmark className="h-4 w-4 fill-current" /> : <BookmarkPlus className="h-4 w-4" />}
+                      </Button>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
 
-          <div className="flex items-center justify-between mt-8 pt-8 border-t border-border">
-            {prevChapter ? (
-              <Link
-                to={`/Hadiths/${collectionId}/${prevChapter.id}`}
-                className="glass-btn px-4 py-2 inline-flex items-center gap-2"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                {t.common.previous} Chapter
-              </Link>
-            ) : <div />}
-
-            {nextChapter && (
-              <Link
-                to={`/Hadiths/${collectionId}/${nextChapter.id}`}
-                className="glass-btn px-4 py-2 inline-flex items-center gap-2"
-              >
-                {t.common.next} Chapter
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            )}
+                  <p className="font-arabic text-2xl text-right mb-4 leading-loose group-hover:text-white dark:group-hover:text-black" dir="rtl">
+                    {hadith.arabic}
+                  </p>
+                  <p className="text-lg mb-3 group-hover:text-white dark:group-hover:text-black">
+                    {hadith.translation}
+                  </p>
+                  {hadith.narrator && (
+                    <p className="text-sm text-muted-foreground group-hover:text-white dark:group-hover:text-black">
+                      Narrated by: <span className="font-medium">{hadith.narrator}</span>
+                    </p>
+                  )}
+                </Card>
+              );
+            })}
           </div>
+        )}
+
+        <div className="flex items-center justify-between mt-8 pt-8 border-t border-border">
+          {prevChapter ? (
+            <Link to={`/Hadith/${collectionId}/${prevChapter.id}`}>
+              <Button className="px-4 py-2 inline-flex items-center gap-2">
+                <ChevronLeft className="h-4 w-4" />
+                {prevChapter.name}
+              </Button>
+            </Link>
+          ) : <div />}
+
+          {nextChapter && (
+            <Link to={`/Hadith/${collectionId}/${nextChapter.id}`}>
+              <Button className="px-4 py-2 inline-flex items-center gap-2">
+                {nextChapter.name}
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          )}
         </div>
-      </section>
+      </div>
     </Layout>
   );
 };
 
-export default HadithChapter;
+export default Hadith_Chapter;

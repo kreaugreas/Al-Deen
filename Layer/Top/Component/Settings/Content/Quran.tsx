@@ -8,7 +8,7 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuTrigger,
 } from "@/Top/Component/UI/dropdown-menu";
-import { useApp } from "@/Middle/Context/App-Context";
+import { useApp } from "@/Middle/Context/App";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { cn } from "@/Middle/Library/utils";
 import { PREVIEW_WORDS, RECITERS, TRANSLATORS } from "../Constants";

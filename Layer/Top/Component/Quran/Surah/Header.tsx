@@ -1,8 +1,10 @@
 import { Info, Play, Pause, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/Top/Component/UI/tooltip";
-import { useAudio } from "@/Middle/Context/Audio-Context";
+import { useAudio } from "@/Middle/Context/Audio";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { Bismillah } from "@/Top/Component/Quran/Bismillah";
+import { Container } from "@/Top/Component/UI/Container";
+import { Button } from "@/Top/Component/UI/Button";
 import type { SurahMeta } from "@/Bottom/API/Quran";
 
 interface SurahHeaderProps {
@@ -46,8 +48,8 @@ export function SurahHeader({
   };
 
   return (
-    <div className="glass-container !rounded-xl !block w-full">
-      <div className="p-4 sm:p-5 space-y-3">
+    <Container className="!px-6 !py-4">
+      <div className="space-y-3">
         {/* Title row: surah number, Arabic name, English translation, actions */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-baseline gap-2 flex-wrap">
@@ -68,26 +70,26 @@ export function SurahHeader({
             </div>
           </div>
 
-          {/* Action buttons as icons with tooltips */}
-          <div className="flex items-center gap-1">
+          {/* Action buttons with Tooltips */}
+          <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
+                  <Button
+                    size="sm"
                     onClick={onInfoClick}
-                    className="p-2 rounded-lg hover:bg-muted/10 transition-colors"
                     aria-label="Surah info"
                   >
                     <Info className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">{t.quran.surahInfo}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
-                    className="p-2 rounded-lg hover:bg-muted/10 transition-colors disabled:opacity-50"
+                  <Button
+                    size="sm"
                     disabled={isAudioLoading}
                     onClick={handleAudioClick}
                     aria-label={isThisSurahPlaying ? "Pause" : "Play surah"}
@@ -99,7 +101,7 @@ export function SurahHeader({
                     ) : (
                       <Play className="h-4 w-4" />
                     )}
-                  </button>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
                   {isThisSurahPlaying ? t.quran.pauseAudio : t.quran.playAudio}
@@ -116,6 +118,6 @@ export function SurahHeader({
           </div>
         )}
       </div>
-    </div>
+    </Container>
   );
 }

@@ -1,4 +1,4 @@
-import { Layout } from "@/Top/Component/Layout/Layout";
+import { Layout } from "@/Top/Component/Layout/Index";
 import { Button } from "@/Top/Component/UI/button";
 import { Textarea } from "@/Top/Component/UI/textarea";
 import { Input } from "@/Top/Component/UI/input";

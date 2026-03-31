@@ -2,17 +2,19 @@
 import { Copy, MoreHorizontal, Bookmark, FileText, Share2, BookMarked } from "lucide-react";
 import { cn } from "@/Middle/Library/utils";
 import { useBookmarks } from "@/Middle/Hook/Use-Bookmarks";
-import { useAuth } from "@/Middle/Context/Auth-Context";
+import { useAuth } from "@/Middle/Context/Auth";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { toast } from "@/Middle/Hook/Use-Toast";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/Top/Component/UI/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/Top/Component/UI/tooltip";
-import { useAudio } from "@/Middle/Context/Audio-Context";
-import { useApp } from "@/Middle/Context/App-Context";
-import { WordTooltip, useAudioPlayback } from "../Safhah/Utility"; // from parent Safhah
+import { useAudio } from "@/Middle/Context/Audio";
+import { useApp } from "@/Middle/Context/App";
+import { WordTooltip, useAudioPlayback } from "../Safhah/Utility";
 import { useState, useMemo } from "react";
+import { Container } from "@/Top/Component/UI/Container";
+import { Button } from "@/Top/Component/UI/Button";
 import type { VerseCardProps } from "./Types";
 
 export function VerseCard({
@@ -33,10 +35,8 @@ export function VerseCard({
   const { hoverTranslation, hoverRecitation, fontSize, quranFont } = useApp();
   const { playingKey, playWordAudio, isPlaying } = useAudioPlayback(surah.id);
 
-  // Local hover state for verse highlighting (exactly like PageView)
   const [hoveredVerse, setHoveredVerse] = useState<number | null>(null);
 
-  // Font class and size (same as PageLines/WordByWord)
   const computedFontClass = useMemo(() => {
     switch (quranFont) {
       case "indopak":    return "font-indopak";
@@ -70,15 +70,14 @@ export function VerseCard({
   };
 
   return (
-    <div
-      ref={verseRef}
+    <Container 
+      ref={verseRef} 
       className={cn(
-        "glass-container !rounded-xl overflow-hidden !block transition-all duration-300",
+        "mb-6", // Add margin bottom for gap between cards
         isHighlighted && "ring-2 ring-primary"
       )}
     >
       <div className="pt-4 px-6 sm:px-8 pb-4">
-        {/* Header – acts like a verse number marker */}
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => playAyah(surah.id, verse.verseNumber)}
@@ -93,20 +92,18 @@ export function VerseCard({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button 
-                    className="p-1.5 rounded-lg hover:bg-muted/10 transition-all" 
-                    onClick={copyVerse}
-                  >
+                  <Button size="sm" className="p-1.5 rounded-lg" onClick={copyVerse}>
                     <Copy className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">{t.quran.copy}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button 
-                    className="p-1.5 rounded-lg hover:bg-muted/10 transition-all"
+                  <Button 
+                    size="sm"
+                    className="p-1.5 rounded-lg"
                     onClick={() => {
                       if (!user) {
                         toast({ title: "Sign in required", description: "Please sign in to bookmark verses" });
@@ -119,18 +116,18 @@ export function VerseCard({
                       ? <BookMarked className="h-4 w-4 fill-current" />
                       : <Bookmark className="h-4 w-4" />
                     }
-                  </button>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">{t.quran.bookmark}</TooltipContent>
               </Tooltip>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-1.5 rounded-lg hover:bg-muted/10 transition-all">
+                  <Button size="sm" className="p-1.5 rounded-lg">
                     <MoreHorizontal className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-48 z-[100]">
                   <DropdownMenuItem className="gap-2 cursor-pointer" onClick={onNotesClick}>
                     <FileText className="h-4 w-4" />
                     {t.quran.myNotes}
@@ -145,7 +142,6 @@ export function VerseCard({
           </div>
         </div>
 
-        {/* Arabic text with word-by-word rendering (identical to PageLines) */}
         {showArabicText && (
           <div className="flex justify-end mb-6">
             <div
@@ -226,7 +222,6 @@ export function VerseCard({
           </div>
         )}
 
-        {/* Translation */}
         {verseTranslation && verse.translation && (
           <div>
             <p 
@@ -238,6 +233,6 @@ export function VerseCard({
           </div>
         )}
       </div>
-    </div>
+    </Container>
   );
 }

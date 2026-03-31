@@ -1,7 +1,9 @@
 import ayahs from "@/Bottom/Data/Quran/Meta/Ayahs.json";
-import names from "@/Bottom/Data/Quran/Meta/Names.json";
-import pageMap from "@/Bottom/Data/Quran/Meta/PageMap.json";
-import juzArray from "@/Bottom/Data/Quran/Meta/Juz.json";
+import Surah_Translation from "@/Bottom/Data/Quran/Meta/Surah/Translation.json";
+import Surah_Transliteration from "@/Bottom/Data/Quran/Meta/Surah/Transliteration.json";
+import pageMap from "@/Bottom/Data/Quran/Meta/Page.json";
+import juzMap from "@/Bottom/Data/Quran/Meta/Juz.json";
+import hizbMap from "@/Bottom/Data/Quran/Meta/Hizb.json";
 import place from "@/Bottom/Data/Quran/Meta/Revelation/Place.json";
 import order from "@/Bottom/Data/Quran/Meta/Revelation/Order.json";
 
@@ -62,15 +64,39 @@ export interface PageSegment {
 export type TranslationSource = string;
 
 // ============= Build surahList =============
+// First, build a map of which surahs appear on which pages
+const surahPageMap: Map<number, { minPage: number; maxPage: number }> = new Map();
+
+if (Array.isArray(pageMap) && pageMap.length > 0) {
+  for (let pageNum = 1; pageNum <= pageMap.length; pageNum++) {
+    const segments = getPageSegments(pageNum);
+    if (!segments) continue;
+    
+    for (const segment of segments) {
+      const surahId = segment.surah;
+      if (!surahPageMap.has(surahId)) {
+        surahPageMap.set(surahId, { minPage: pageNum, maxPage: pageNum });
+      } else {
+        const current = surahPageMap.get(surahId)!;
+        surahPageMap.set(surahId, {
+          minPage: Math.min(current.minPage, pageNum),
+          maxPage: Math.max(current.maxPage, pageNum),
+        });
+      }
+    }
+  }
+}
+
+// Then build surahList using the map
 export const surahList: SurahMeta[] = (Array.isArray(ayahs) ? ayahs : []).map((ayahCount, idx) => {
   const id = idx + 1;
-  const englishNameTranslation = Array.isArray(names) && names[id - 1] ? names[id - 1] : "";
+  const englishNameTranslation = Array.isArray(Surah_Translation) && Surah_Translation[id - 1] ? Surah_Translation[id - 1] : "";
+  const englishNameTransliteration = Array.isArray(Surah_Translation) && Surah_Translation[id - 1] ? Surah_Translation[id - 1] : "";
   const fontName = id.toString().padStart(3, '0');
-  const startPage = 1;
-  const endPage = 604;
+  const pageRange = surahPageMap.get(id) || { minPage: 1, maxPage: 604 };
   const revelationType = Array.isArray(place) && place[id - 1] ? (place[id - 1] as "Meccan" | "Medinan") : "Meccan";
   const revelationOrder = Array.isArray(order) && order[id - 1] ? order[id - 1] : id;
-  const juz = Array.isArray(juzArray) && juzArray[id - 1] ? juzArray[id - 1] : 1;
+  const juz = 1;
 
   const arabicName = "";
   return {
@@ -78,11 +104,12 @@ export const surahList: SurahMeta[] = (Array.isArray(ayahs) ? ayahs : []).map((a
     name: arabicName,
     surahFontName: fontName,
     englishName: "",
+    englishNameTransliteration,
     englishNameTranslation,
     numberOfAyahs: ayahCount,
     revelationType,
     revelationOrder,
-    pages: [startPage, endPage],
+    pages: [pageRange.minPage, pageRange.maxPage],
     juz,
   };
 });
@@ -147,8 +174,128 @@ export function getPageSegments(pageNumber: number): PageSegment[] | null {
   return result.length > 0 ? result : null;
 }
 
-// ============= Build juzData from Juz.json =============
-const juzStartMap: number[] = Array.isArray(juzArray) ? juzArray : [];
+// ============= Juz Map Parser =============
+export function getJuzSegments(juzNumber: number): PageSegment[] | null {
+  if (!juzMap || !Array.isArray(juzMap)) {
+    console.error("Juz map not loaded properly");
+    return null;
+  }
+
+  if (juzNumber < 1 || juzNumber > juzMap.length) {
+    console.warn(`Juz ${juzNumber} not found. Total juz: ${juzMap.length}`);
+    return null;
+  }
+  
+  const juzData = juzMap[juzNumber - 1];
+  if (!juzData) {
+    console.warn(`No data for juz ${juzNumber}`);
+    return null;
+  }
+  
+  const segments = juzData.split('|');
+  
+  const result: PageSegment[] = [];
+  
+  for (const segment of segments) {
+    const [start, end] = segment.split('-');
+    
+    if (!start || !end) {
+      console.error(`Invalid segment format: ${segment}`);
+      continue;
+    }
+    
+    const startParts = start.split('.');
+    if (startParts.length !== 2) {
+      console.error(`Invalid start format: ${start}`);
+      continue;
+    }
+    
+    const [startSurahVerse, startWord] = startParts;
+    const [startSurah, startVerse] = startSurahVerse.split(':');
+    
+    const endParts = end.split('.');
+    if (endParts.length !== 2) {
+      console.error(`Invalid end format: ${end}`);
+      continue;
+    }
+    
+    const [endSurahVerse, endWord] = endParts;
+    const [endSurah, endVerse] = endSurahVerse.split(':');
+    
+    result.push({
+      surah: parseInt(startSurah),
+      startVerse: parseInt(startVerse),
+      startWord: parseInt(startWord),
+      endVerse: parseInt(endVerse),
+      endWord: parseInt(endWord),
+    });
+  }
+  
+  return result.length > 0 ? result : null;
+}
+
+// ============= Hizb Map Parser =============
+export function getHizbSegments(hizbNumber: number): PageSegment[] | null {
+  if (!hizbMap || !Array.isArray(hizbMap)) {
+    console.error("Hizb map not loaded properly");
+    return null;
+  }
+
+  if (hizbNumber < 1 || hizbNumber > hizbMap.length) {
+    console.warn(`Hizb ${hizbNumber} not found. Total hizb: ${hizbMap.length}`);
+    return null;
+  }
+  
+  const hizbData = hizbMap[hizbNumber - 1];
+  if (!hizbData) {
+    console.warn(`No data for hizb ${hizbNumber}`);
+    return null;
+  }
+  
+  const segments = hizbData.split('|');
+  
+  const result: PageSegment[] = [];
+  
+  for (const segment of segments) {
+    const [start, end] = segment.split('-');
+    
+    if (!start || !end) {
+      console.error(`Invalid segment format: ${segment}`);
+      continue;
+    }
+    
+    const startParts = start.split('.');
+    if (startParts.length !== 2) {
+      console.error(`Invalid start format: ${start}`);
+      continue;
+    }
+    
+    const [startSurahVerse, startWord] = startParts;
+    const [startSurah, startVerse] = startSurahVerse.split(':');
+    
+    const endParts = end.split('.');
+    if (endParts.length !== 2) {
+      console.error(`Invalid end format: ${end}`);
+      continue;
+    }
+    
+    const [endSurahVerse, endWord] = endParts;
+    const [endSurah, endVerse] = endSurahVerse.split(':');
+    
+    result.push({
+      surah: parseInt(startSurah),
+      startVerse: parseInt(startVerse),
+      startWord: parseInt(startWord),
+      endVerse: parseInt(endVerse),
+      endWord: parseInt(endWord),
+    });
+  }
+  
+  return result.length > 0 ? result : null;
+}
+
+// ============= Build juzData from Juz.json (for backward compatibility) =============
+const juzStartMap: number[] = Array.isArray(juzMap) ? juzMap.map(() => 1) : [];
 const juzGroups: { [key: number]: number[] } = {};
 for (let i = 0; i < juzStartMap.length; i++) {
   const juz = juzStartMap[i];
@@ -380,7 +527,19 @@ export async function getVerse(
 export function getSurahMeta(surahId: number): SurahMeta | null {
   return surahList.find((s) => s.id === surahId) ?? null;
 }
+// Add these exports at the bottom of Quran.ts
 
+export const getJuzCount = (): number => {
+  return Array.isArray(juzMap) ? juzMap.length : 0;
+};
+
+export const getHizbCount = (): number => {
+  return Array.isArray(hizbMap) ? hizbMap.length : 0;
+};
+
+export const getPageCount = (): number => {
+  return Array.isArray(pageMap) ? pageMap.length : 0;
+};
 export function getJuzInfo(juzNumber: number): JuzInfo | null {
   return juzData.find((j) => j.juzNumber === juzNumber) ?? null;
 }

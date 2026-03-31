@@ -1,8 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { Layout } from "@/Top/Component/Layout/Layout";
-import { Copy, Share2, ChevronRight } from "lucide-react";
+import { Layout } from "@/Top/Component/Layout/Index";
+import { Copy, Share2 } from "lucide-react";
 import { getDuaCategory, type DuaItem } from "@/Bottom/API/Aid";
 import { toast } from "@/Middle/Hook/Use-Toast";
+import { Button } from "@/Top/Component/UI/Button";
+import { Container } from "@/Top/Component/UI/Container";
 
 const COLLECTION_MAP: Record<string, { name: string; route: string }> = {
   bukhari: { name: "Sahih al-Bukhari", route: "/Hadiths/bukhari" },
@@ -30,7 +32,7 @@ function ReferenceLink({ reference }: { reference: string }) {
           <span key={i}>
             {i > 0 && ", "}
             {collection ? (
-              <Link to={collection.route} className="text-primary hover:underline">
+              <Link to={collection.route} className="inline-flex items-center text-primary hover:underline">
                 {collection.name}
               </Link>
             ) : (
@@ -43,20 +45,24 @@ function ReferenceLink({ reference }: { reference: string }) {
   );
 }
 
-const DuaCategoryPage = () => {
+const Dua_Category = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const category = categoryId ? getDuaCategory(categoryId) : null;
 
   if (!category) {
     return (
-      <Layout>
-        <div className="container py-16 text-center">
-          <div className="glass-card max-w-md mx-auto p-8">
-            <h1 className="text-2xl font-semibold mb-4">Category Not Found</h1>
-            <Link to="/Aid/Dua" className="text-primary hover:underline">Back to Duas</Link>
+        <Layout>
+          <div className="container py-16 text-center">
+            <Container className="max-w-md mx-auto">
+              <div className="p-8 text-center">
+                <h1 className="text-2xl font-semibold mb-4">Category Not Found</h1>
+                <Link to="/Aid/Dua" className="inline-block">
+                  <Button>Back to Duas</Button>
+                </Link>
+              </div>
+            </Container>
           </div>
-        </div>
-      </Layout>
+        </Layout>
     );
   }
 
@@ -78,51 +84,56 @@ const DuaCategoryPage = () => {
   };
 
   return (
-    <Layout>
-      <section className="py-6">
-        <div className="container max-w-3xl">
-          <nav className="flex items-center gap-1.5 text-sm mb-6 flex-wrap">
-            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              Root
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <Link to="/Aid" className="text-muted-foreground hover:text-foreground transition-colors">
-              Aid
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <Link to="/Aid/Dua" className="text-muted-foreground hover:text-foreground transition-colors">
-              Dua
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-foreground font-medium">{category.name}</span>
-          </nav>
+      <Layout>
+        <section className="py-6">
+          <div className="container max-w-3xl">
+            <Container className="p-6 mb-6">
+              <h1 className="text-2xl font-bold">{category.name}</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {category.duas.length} Dua{category.duas.length !== 1 ? 's' : ''}
+              </p>
+            </Container>
 
-          <div className="space-y-5">
-            {category.duas.map((dua: DuaItem) => (
-              <div key={dua.id} className="glass-card p-5 !block space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center justify-center w-7 h-7 glass-btn text-primary text-xs font-semibold">
-                    {dua.id}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button className="glass-icon-btn w-7 h-7" onClick={() => handleCopy(dua)}>
-                      <Copy className="h-3.5 w-3.5" />
-                    </button>
-                    <button className="glass-icon-btn w-7 h-7" onClick={() => handleShare(dua)}>
-                      <Share2 className="h-3.5 w-3.5" />
-                    </button>
+            <div className="space-y-5">
+              {category.duas.map((dua: DuaItem) => (
+                <Container key={dua.id} className="p-5 space-y-4 group">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-muted text-primary text-xs font-semibold group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                      {dua.id}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        className="w-7 h-7 p-0"
+                        onClick={() => handleCopy(dua)}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="w-7 h-7 p-0"
+                        onClick={() => handleShare(dua)}
+                      >
+                        <Share2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <p className="font-arabic text-xl text-right leading-loose" dir="rtl">{dua.arabic}</p>
-                <p className="text-foreground">{dua.translation}</p>
-                <ReferenceLink reference={dua.reference} />
-              </div>
-            ))}
+                  <p className="font-arabic text-xl text-right leading-loose" dir="rtl">
+                    {dua.arabic}
+                  </p>
+                  <p className="text-foreground">
+                    {dua.translation}
+                  </p>
+                  <div className="pt-2 border-t border-border/50">
+                    <ReferenceLink reference={dua.reference} />
+                  </div>
+                </Container>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-    </Layout>
+        </section>
+      </Layout>
   );
 };
 
-export default DuaCategoryPage;
+export default Dua_Category;

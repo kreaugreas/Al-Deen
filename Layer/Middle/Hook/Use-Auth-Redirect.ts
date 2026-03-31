@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/Middle/Context/Auth-Context";
+import { useAuth } from "@/Middle/Context/Auth";
 import { toast } from "@/Middle/Hook/Use-Toast";
 
 export function useAuthRedirect() {

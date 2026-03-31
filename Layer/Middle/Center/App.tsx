@@ -4,9 +4,9 @@ import { Toaster as Sonner } from "@/Top/Component/UI/sonner";
 import { TooltipProvider } from "@/Top/Component/UI/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AppProvider } from "@/Middle/Context/App-Context";
-import { AudioProvider } from "@/Middle/Context/Audio-Context";
-import { AuthProvider } from "@/Middle/Context/Auth-Context";
+import { AppProvider } from "@/Middle/Context/App";
+import { AudioProvider } from "@/Middle/Context/Audio";
+import { AuthProvider } from "@/Middle/Context/Auth";
 import { ErrorBoundary } from "@/Top/Component/Error-Boundary";
 import { GridSkeleton } from "@/Top/Component/Skeleton/Content-Skeleton";
 
@@ -15,41 +15,39 @@ import Index from "@/Top/Page/Index";
 // Quran
 const Quran        = lazy(() => import("@/Top/Page/Quran/Index"));
 const SurahIndex   = lazy(() => import("@/Top/Page/Quran/Surah/Index"));
+const JuzIndex   = lazy(() => import("@/Top/Page/Quran/Juz"));
+const HizbIndex   = lazy(() => import("@/Top/Page/Quran/Hizb"));
 const AyahIndex    = lazy(() => import("@/Top/Page/Quran/Surah/Ayah/Index"));
 const KalimaIndex  = lazy(() => import("@/Top/Page/Quran/Surah/Ayah/Kalima/Index"));
-const QuranGoals   = lazy(() => import("@/Top/Component/Quran/Goals"));
-const JuzPage      = lazy(() => import("@/Top/Page/Juz-Page"));
-const QuranPage    = lazy(() => import("@/Top/Page/Quran/Index"));
+const QuranGoals   = lazy(() => import("@/Top/Page/Quran/Goal"));
+const QuranPage    = lazy(() => import("@/Top/Page/Quran/Safhah"));
 
 // Hadith
-const Hadiths          = lazy(() => import("@/Top/Page/Hadith/List"));
-const HadithCollection = lazy(() => import("@/Top/Page/Hadith/Collection"));
-const HadithChapter    = lazy(() => import("@/Top/Page/Hadith/Chapter"));
+const Hadith          = lazy(() => import("@/Top/Page/Hadith/Index"));
+const Hadith_Collection = lazy(() => import("@/Top/Page/Hadith/Collection"));
+const Hadith_Chapter    = lazy(() => import("@/Top/Page/Hadith/Chapter"));
 
 // Aid
-const Aid              = lazy(() => import("@/Top/Page/Aid/Main"));
-const Dua              = lazy(() => import("@/Top/Page/Aid/Dua/List"));
-const DuaCategory      = lazy(() => import("@/Top/Page/Aid/Dua/Category"));
+const Aid              = lazy(() => import("@/Top/Page/Aid/Index"));
+const Dua              = lazy(() => import("@/Top/Page/Aid/Dua/Index"));
+const Dua_Category      = lazy(() => import("@/Top/Page/Aid/Dua/Category"));
 const AlphabetIndex    = lazy(() => import("@/Top/Page/Aid/Alphabet/Index"));
 const AlphabetLetter   = lazy(() => import("@/Top/Page/Aid/Alphabet/Letter"));
-const TajweedCategory  = lazy(() => import("@/Top/Page/Aid/Alphabet/Tajweed/Category"));
-const TajweedRule      = lazy(() => import("@/Top/Page/Aid/Alphabet/Tajweed/Rule"));
-const PrayerTimes      = lazy(() => import("@/Top/Page/Prayer-Times"));
-const QiblaPage        = lazy(() => import("@/Top/Page/Qibla"));
-const HijriCalendar    = lazy(() => import("@/Top/Page/Hijri-Calendar"));
-const ZakatCalculator  = lazy(() => import("@/Top/Page/Zakat-Calculator"));
+const Tajweed      = lazy(() => import("@/Top/Page/Aid/Tajweed/Main"));
+const TajweedCategory  = lazy(() => import("@/Top/Page/Aid/Tajweed/Category"));
+const TajweedRule      = lazy(() => import("@/Top/Page/Aid/Tajweed/Rule"));
+const PrayerTimes      = lazy(() => import("@/Top/Page/Aid/Prayer-Times"));
+const QiblaPage        = lazy(() => import("@/Top/Page/Aid/Qibla"));
+const HijriCalendar    = lazy(() => import("@/Top/Page/Aid/Hijri-Calendar"));
+const ZakatCalculator  = lazy(() => import("@/Top/Page/Aid/Zakat-Calculator"));
 
 // General
 const Feedback       = lazy(() => import("@/Top/Page/Feedback"));
-const SignIn         = lazy(() => import("@/Top/Page/Sign-In"));
-const SignUp         = lazy(() => import("@/Top/Page/Sign-Up"));
-const ForgotPassword = lazy(() => import("@/Top/Page/Forgot-Password"));
-const Privacy        = lazy(() => import("@/Top/Page/Privacy"));
-const Terms          = lazy(() => import("@/Top/Page/Terms"));
-const Sitemap        = lazy(() => import("@/Top/Page/Sitemap"));
+const SignIn         = lazy(() => import("@/Top/Page/Auth/Sign-In"));
+const SignUp         = lazy(() => import("@/Top/Page/Auth/Sign-Up"));
+const ForgotPassword = lazy(() => import("@/Top/Page/Auth/Forgot-Password"));
 const SearchResults  = lazy(() => import("@/Top/Page/Search-Results"));
-const Profile        = lazy(() => import("@/Top/Page/Profile"));
-const NotFound       = lazy(() => import("@/Top/Page/Not-Found"));
+const Not_Found       = lazy(() => import("@/Top/Page/404"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,24 +88,25 @@ const App = () => (
                     <Route path="/Quran/Surah/:id"                                            element={<SurahIndex />} />
                     <Route path="/Quran/Surah/:id/Ayah/:verseId"                              element={<AyahIndex />} />
                     <Route path="/Quran/Surah/:id/Ayah/:verseId/Kalima/:kalimaId"             element={<KalimaIndex />} />
-                    <Route path="/Quran/Juz/:id"                                              element={<JuzPage />} />
+                    <Route path="/Quran/Juz/:id"                                              element={<JuzIndex />} />
+                    <Route path="/Quran/Hizb/:id"                                              element={<HizbIndex />} />
                     <Route path="/Quran/Page/:id"                                             element={<QuranPage />} />
-                    <Route path="/Quran/Hizb/:id"                                             element={<JuzPage />} />
-                    <Route path="/Quran/Goals"                                                element={<QuranGoals />} />
+                    <Route path="/Quran/Goal"                                                element={<QuranGoals />} />
 
                     {/* ── Hadith ── */}
-                    <Route path="/Hadiths"                                                    element={<Hadiths />} />
-                    <Route path="/Hadiths/:collectionId"                                      element={<HadithCollection />} />
-                    <Route path="/Hadiths/:collectionId/:chapterId"                           element={<HadithChapter />} />
+                    <Route path="/Hadith"                                                    element={<Hadith />} />
+                    <Route path="/Hadith/:collectionId"                                      element={<Hadith_Collection />} />
+                    <Route path="/Hadith/:collectionId/:chapterId"                           element={<Hadith_Chapter />} />
 
                     {/* ── Aid ── */}
                     <Route path="/Aid"                                                        element={<Aid />} />
                     <Route path="/Aid/Dua"                                                    element={<Dua />} />
-                    <Route path="/Aid/Dua/:categoryId"                                        element={<DuaCategory />} />
+                    <Route path="/Aid/Dua/:categoryId"                                        element={<Dua_Category />} />
                     <Route path="/Aid/Alphabet"                                               element={<AlphabetIndex />} />
                     <Route path="/Aid/Alphabet/:letterId"                                     element={<AlphabetLetter />} />
-                    <Route path="/Aid/Alphabet/Tajweed/:categoryId"                           element={<TajweedCategory />} />
-                    <Route path="/Aid/Alphabet/Tajweed/:categoryId/:subcategoryId"            element={<TajweedRule />} />
+  <Route path="/Aid/Tajweed"                           element={<Tajweed />} />
+                    <Route path="/Aid/Tajweed/:categoryId"                           element={<TajweedCategory />} />
+                    <Route path="/Aid/Tajweed/:categoryId/:subcategoryId"            element={<TajweedRule />} />
                     <Route path="/Aid/Prayers"                                                element={<PrayerTimes />} />
                     <Route path="/Aid/Qibla"                                                  element={<QiblaPage />} />
                     <Route path="/Aid/Hijri-Calendar"                                         element={<HijriCalendar />} />
@@ -118,12 +117,8 @@ const App = () => (
                     <Route path="/Sign-In"                                                    element={<SignIn />} />
                     <Route path="/Sign-Up"                                                    element={<SignUp />} />
                     <Route path="/Forgot-Password"                                            element={<ForgotPassword />} />
-                    <Route path="/Privacy"                                                    element={<Privacy />} />
-                    <Route path="/Terms"                                                      element={<Terms />} />
-                    <Route path="/Sitemap"                                                    element={<Sitemap />} />
                     <Route path="/Search"                                                     element={<SearchResults />} />
-                    <Route path="/Profile"                                                    element={<Profile />} />
-                    <Route path="*"                                                           element={<NotFound />} />
+                    <Route path="*"                                                           element={<Not_Found />} />
                   </Routes>
                 </Suspense>
               </TooltipProvider>

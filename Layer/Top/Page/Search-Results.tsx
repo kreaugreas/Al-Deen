@@ -1,5 +1,5 @@
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { Layout } from "@/Top/Component/Layout/Layout";
+import { Layout } from "@/Top/Component/Layout/Index";
 import { Search, Loader2, BookOpen, BookText, MessageSquare, Home, Clock } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { surahList, getSurah } from "@/Bottom/API/Quran";

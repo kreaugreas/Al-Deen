@@ -5,7 +5,7 @@ const duaModules = import.meta.glob<{ default: DuaCategory }>(
 );
 
 const tajweedModules = import.meta.glob<{ default: TajweedCategory }>(
-  "@/Bottom/Data/Aid/Alphabet/Tajweed/**/*.json",
+  "@/Bottom/Data/Aid/Tajweed/**/*.json",
   { eager: true }
 );
 

@@ -1,4 +1,4 @@
-import { ProgressBar } from "../Progress-Bar";
+import { Container } from "@/Top/Component/UI/Container";
 import { useScrollDirection } from "@/Middle/Hook/Use-Scroll-Direction";
 
 interface SurahNavbarProps {
@@ -7,40 +7,53 @@ interface SurahNavbarProps {
   juz?: number;
   hizb?: number;
   page?: number;
-  progress?: number;
 }
 
-export function SurahNavbar({ surahName, juz, hizb, page, progress = 0 }: SurahNavbarProps) {
+export function SurahNavbar({ surahName, juz, hizb, page }: SurahNavbarProps) {
   const { scrollDirection, isAtTop } = useScrollDirection();
   const headerVisible = isAtTop || scrollDirection === "up";
 
   return (
     <div
-      className="fixed left-0 right-0 z-40 w-full transition-all duration-300 backdrop-blur-xl bg-background/70"
+      className="fixed left-0 right-0 z-40 w-full transition-all duration-300 flex justify-end"
       style={{ top: headerVisible ? "80px" : "8px" }}
     >
-      <div className="container relative flex flex-col gap-1 py-1">
-        <div className="flex items-center justify-between px-2 sm:px-3 py-1.5">
-          <span className="text-xs sm:text-sm font-medium text-foreground truncate">
+      <Container className="!py-2 !px-4 !w-auto mr-4">
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium text-foreground truncate">
             {surahName}
           </span>
 
-          {juz !== undefined && (
-            <span className="text-xs text-muted-foreground">
+          {juz !== undefined && hizb !== undefined && page !== undefined && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="hidden sm:inline">
-                Juz <span className="font-semibold text-foreground/80">{juz}</span> / Hizb <span className="font-semibold text-foreground/80">{hizb}</span> / Page <span className="font-semibold text-foreground/80">{page}</span>
+                Juz <span className="font-semibold text-foreground/80">{juz}</span>
               </span>
               <span className="sm:hidden">
-                J<span className="font-semibold text-foreground/80">{juz}</span> / H<span className="font-semibold text-foreground/80">{hizb}</span> / P<span className="font-semibold text-foreground/80">{page}</span>
+                J<span className="font-semibold text-foreground/80">{juz}</span>
               </span>
-            </span>
+              
+              <span className="text-muted-foreground/30">•</span>
+              
+              <span className="hidden sm:inline">
+                Hizb <span className="font-semibold text-foreground/80">{hizb}</span>
+              </span>
+              <span className="sm:hidden">
+                H<span className="font-semibold text-foreground/80">{hizb}</span>
+              </span>
+              
+              <span className="text-muted-foreground/30">•</span>
+              
+              <span className="hidden sm:inline">
+                Page <span className="font-semibold text-foreground/80">{page}</span>
+              </span>
+              <span className="sm:hidden">
+                P<span className="font-semibold text-foreground/80">{page}</span>
+              </span>
+            </div>
           )}
         </div>
-
-        <div className="w-full">
-          <ProgressBar progress={progress} className="relative h-1.5 rounded-full overflow-hidden !justify-start" />
-        </div>
-      </div>
+      </Container>
     </div>
   );
 }

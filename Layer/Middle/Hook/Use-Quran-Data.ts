@@ -1,7 +1,7 @@
 // Use-Quran-Data.ts
 import { useQuery } from '@tanstack/react-query';
 import { getSurah, type AssembledSurah, type QuranFontType } from '@/Bottom/API/Quran';
-import { useApp, type QuranFontFamily } from '@/Middle/Context/App-Context';
+import { useApp, type QuranFontFamily } from '@/Middle/Context/App';
 
 function mapFontToDataType(font: QuranFontFamily): QuranFontType {
   switch (font) {

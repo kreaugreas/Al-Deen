@@ -1,20 +1,26 @@
 import { useState, useEffect, useRef, memo } from "react";
 import { Textarea } from "@/Top/Component/UI/textarea";
 import { useNotes } from "@/Middle/Hook/Use-Notes";
-import { useAuth } from "@/Middle/Context/Auth-Context";
+import { useAuth } from "@/Middle/Context/Auth";
 import { surahList } from "@/Bottom/API/Quran";
-import { Loader2, NotebookPen, Save, Trash2, Lightbulb, User } from "lucide-react";
+import { Loader2, Save, Trash2, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/Middle/Hook/Use-Mobile";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { ScrollArea } from "@/Top/Component/UI/scroll-area";
+import { Container } from "@/Top/Component/UI/Container";
+import { Button } from "@/Top/Component/UI/Button";
+import { useApp } from "@/Middle/Context/App";
+import { useAudio } from "@/Middle/Context/Audio";
+import { WordTooltip, useAudioPlayback } from "../Quran/Layout/Safhah/Utility";
+import type { AssembledVerse, SurahMeta } from "@/Bottom/API/Quran";
 
 interface NotesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   surahId: number;
   ayahId?: number;
-  verseText?: string;
+  verse?: AssembledVerse; // Pass the full verse object instead of just verseText
 }
 
 export const NotesDialog = memo(function NotesDialog({ 
@@ -22,21 +28,37 @@ export const NotesDialog = memo(function NotesDialog({
   onOpenChange, 
   surahId, 
   ayahId, 
-  verseText 
+  verse 
 }: NotesDialogProps) {
   const { user } = useAuth();
   const { saveNote, getNote, deleteNote, isLoading } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { t } = useTranslation();
+  const { hoverTranslation, hoverRecitation, fontSize, quranFont } = useApp();
+  const { activeVerse, activeWord, playAyah } = useAudio();
+  const { playingKey, playWordAudio, isPlaying } = useAudioPlayback(surahId);
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [hoveredVerse, setHoveredVerse] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const surah = surahList.find((s) => s.id === surahId);
   const existingNote = getNote(surahId, ayahId);
+
+  const computedFontClass = (() => {
+    switch (quranFont) {
+      case "indopak":    return "font-indopak";
+      case "uthmani_v1": return "font-uthmani_v1";
+      case "uthmani_v2": return "font-uthmani_v2";
+      case "uthmani_v4": return "font-uthmani_v4";
+      default:           return "font-uthmani";
+    }
+  })();
+
+  const arabicFontSize = `${(1.5 * fontSize) / 5}rem`;
 
   useEffect(() => {
     if (open && existingNote) {
@@ -72,65 +94,151 @@ export const NotesDialog = memo(function NotesDialog({
       <div className="fixed inset-0 z-40 bg-background pt-[72px]">
         <div className="h-full overflow-y-auto">
           <div className="p-4 sm:p-6 mx-auto max-w-2xl">
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="glass-icon-btn w-16 h-16 mb-4 pointer-events-none">
-                <User className="h-8 w-8 text-muted-foreground" />
+            <Container className="text-center py-16">
+              <div className="flex flex-col items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                  <User className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h2 className="text-xl font-semibold mb-2">Sign In Required</h2>
+                <p className="text-muted-foreground mb-6">Please sign in to save your notes.</p>
+                <div className="flex gap-3">
+                  <Button variant="secondary" onClick={() => onOpenChange(false)}>
+                    {t.common.cancel}
+                  </Button>
+                  <Button 
+                    onClick={() => { 
+                      onOpenChange(false); 
+                      navigate("/Sign-In"); 
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                </div>
               </div>
-              <h2 className="text-xl font-semibold mb-2">Sign In Required</h2>
-              <p className="text-muted-foreground mb-6">Please sign in to save your notes.</p>
-              <div className="flex gap-3">
-                <button className="glass-btn px-6 py-2" onClick={() => onOpenChange(false)}>{t.common.cancel}</button>
-                <button className="glass-btn px-6 py-2 bg-primary text-primary-foreground" onClick={() => { onOpenChange(false); navigate("/Sign-In"); }}>Sign In</button>
-              </div>
-            </div>
+            </Container>
           </div>
         </div>
       </div>
     );
   }
 
-  const renderContent = () => (
-    <div className="space-y-4 max-w-2xl mx-auto">
-      <div className="glass-card p-3 flex items-start gap-3">
-        <Lightbulb className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-muted-foreground">
-          Reflecting on the Quran (Tadabbur) involves pondering over its meanings and how they apply to your life.
-        </p>
-      </div>
+  const renderVerseWithTooltips = () => {
+    if (!verse) return null;
+    
+    return (
+      <div className={computedFontClass} style={{ fontSize: arabicFontSize, lineHeight: 1.8 }} dir="rtl">
+        {verse.words.map((glyph, idx) => {
+          const isVerseEnd = idx === verse.words.length - 1;
+          const belongsToVerse = verse.verseNumber;
+          const isVerseHighlighted = hoveredVerse !== null && belongsToVerse === hoveredVerse;
 
-      {verseText && (
-        <div className="glass-card p-4">
-          <p className="text-right font-arabic text-lg leading-loose" dir="rtl">{verseText}</p>
-        </div>
+          const translation = (!isVerseEnd && verse.wbwTranslation?.[idx]) || undefined;
+          const wordKey = `word-${verse.verseNumber}-${idx}`;
+          const ayahKey = `ayah-${verse.verseNumber}`;
+          const isPlayingAudio = isPlaying(wordKey) || isPlaying(ayahKey);
+          const isActive = !isVerseEnd && verse.verseNumber === activeVerse && idx === activeWord;
+
+          let handleClick: (() => void) | undefined;
+          if (isVerseEnd) {
+            handleClick = () => playAyah(surahId, verse.verseNumber);
+          } else {
+            handleClick = () => playWordAudio(verse.verseNumber, idx);
+          }
+
+          const handleMouseEnter = () => {
+            if (isVerseEnd) {
+              setHoveredVerse(verse.verseNumber);
+            }
+          };
+
+          const handleMouseLeave = () => {
+            if (isVerseEnd) {
+              setHoveredVerse(null);
+            }
+          };
+
+          let className = "inline select-text transition-colors duration-200 ";
+          if (isVerseHighlighted && !isVerseEnd) {
+            className += "text-primary";
+          } else if (isActive) {
+            className += "text-emerald-500 animate-pulse";
+          } else if (isPlayingAudio) {
+            className += "text-primary animate-pulse";
+          } else if (isVerseEnd) {
+            className += "text-muted-foreground hover:text-primary cursor-pointer";
+          } else {
+            className += "text-foreground hover:text-primary";
+          }
+
+          let cursorStyle = "text";
+          if (isVerseEnd) {
+            cursorStyle = "pointer";
+          } else if (hoverRecitation) {
+            cursorStyle = "pointer";
+          }
+
+          return (
+            <WordTooltip
+              key={idx}
+              translation={translation}
+              enabled={hoverTranslation}
+              onClick={handleClick}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <span
+                className={className}
+                style={{ cursor: cursorStyle }}
+                onClick={handleClick}
+              >
+                {glyph}{' '}
+              </span>
+            </WordTooltip>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderContent = () => (
+    <div className="space-y-4">
+      {verse && (
+        <Container className="!py-4 !px-5">
+          {renderVerseWithTooltips()}
+        </Container>
       )}
 
       <div className="space-y-2">
-        <label className="text-sm font-medium flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
-            {existingNote ? t.common.edit : "New"}
-          </span>
-          Your Note
-        </label>
-        <Textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Use this space to save general notes, or to write a reflection..."
-          className="min-h-[200px] resize-none glass-input border-0 rounded-2xl"
-        />
+        <Container className="!p-0 overflow-hidden">
+          <Textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Use this space to save general notes, or to write a reflection..."
+            className="min-h-[200px] resize-none bg-transparent border-0 p-4 focus:outline-none focus:ring-0"
+          />
+        </Container>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-border/50">
+      <div className="flex items-center justify-between pt-4">
         {existingNote ? (
-          <button className="glass-btn px-4 py-2 text-destructive text-sm" onClick={handleDelete} disabled={isDeleting}>
+          <Button 
+            variant="secondary" 
+            onClick={handleDelete} 
+            disabled={isDeleting}
+            className="text-destructive hover:text-destructive"
+          >
             {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
             {t.common.delete}
-          </button>
+          </Button>
         ) : <div />}
-        <button className="glass-btn px-6 py-2 bg-primary text-primary-foreground text-sm" onClick={handleSave} disabled={isSaving || !content.trim()}>
+        <Button 
+          onClick={handleSave} 
+          disabled={isSaving || !content.trim()}
+        >
           {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
           {t.common.save} Privately
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -140,9 +248,6 @@ export const NotesDialog = memo(function NotesDialog({
       <div className="fixed inset-0 z-40 bg-background pt-[72px]">
         <div ref={scrollRef} className="h-full overflow-y-auto overscroll-contain">
           <div className="p-4 space-y-4">
-            <h2 className="text-lg font-semibold text-foreground text-center">
-              My Notes – {surah?.englishName} {ayahId ? `${ayahId}` : ''}
-            </h2>
             {renderContent()}
           </div>
         </div>
@@ -154,9 +259,6 @@ export const NotesDialog = memo(function NotesDialog({
     <div className="fixed inset-0 z-40 bg-background pt-[72px]">
       <ScrollArea className="h-full" ref={scrollRef}>
         <div className="p-6 mx-auto max-w-2xl">
-          <h2 className="text-lg font-semibold text-foreground mb-6 text-center">
-            My Notes – {surah?.englishName} {ayahId ? `${ayahId}` : ''}
-          </h2>
           {renderContent()}
         </div>
       </ScrollArea>

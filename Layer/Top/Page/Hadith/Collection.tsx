@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
-import { Layout } from "@/Top/Component/Layout/Layout";
+import { Layout } from "@/Top/Component/Layout/Index";
+import { Card } from "@/Top/Component/UI/Card";
+import { Button } from "@/Top/Component/UI/Button";
 import { getCollection, getChaptersByCollection } from "@/Bottom/API/Hadith";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
-import { ChevronRight } from "lucide-react";
 
-const HadithCollection = () => {
+const Hadith_Collection = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
   const { t } = useTranslation();
 
@@ -14,13 +15,15 @@ const HadithCollection = () => {
   if (!collection) {
     return (
       <Layout>
-        <div className="container py-16 text-center">
-          <div className="glass-card max-w-md mx-auto p-8">
+        <div className="py-16 text-center">
+          <Card className="max-w-md mx-auto p-8">
             <h1 className="text-2xl font-semibold mb-4">Collection Not Found</h1>
-            <Link to="/Hadiths" className="text-primary hover:underline">
-              {t.common.back} to {t.hadiths.title}
+            <Link to="/Hadith">
+              <Button>
+                {t.common.back} to {t.hadiths.title}
+              </Button>
             </Link>
-          </div>
+          </Card>
         </div>
       </Layout>
     );
@@ -28,50 +31,45 @@ const HadithCollection = () => {
 
   return (
     <Layout>
-      <section className="py-6">
-        <div className="container">
-          {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-sm mb-6 flex-wrap">
-            <Link to="/Hadiths" className="text-muted-foreground hover:text-foreground transition-colors">
-              {t.hadiths.title}
+      {chapters.length === 0 ? (
+        <Card className="p-8 text-center">
+          <p className="text-muted-foreground">No chapters available yet.</p>
+        </Card>
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          {chapters.map((chapter, index) => (
+            <Link
+              key={chapter.id}
+              to={`/Hadith/${collectionId}/${chapter.id}`}
+              className="flex-1 min-w-[150px]"
+            >
+              <Card className="p-4 text-center transition-all hover:scale-[1.01] group">
+                <div className="flex flex-col items-center gap-2">
+                  <Button
+                    size="sm"
+                    className="w-10 h-10 rounded-full p-0 flex items-center justify-center"
+                  >
+                    {index + 1}
+                  </Button>
+                  <p className="font-semibold text-sm group-hover:text-white dark:group-hover:text-black">
+                    {chapter.name}
+                  </p>
+                  {chapter.hadithRange && (
+                    <Button
+                      size="sm"
+                      className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground h-auto"
+                    >
+                      {chapter.hadithRange}
+                    </Button>
+                  )}
+                </div>
+              </Card>
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-foreground font-medium">{collection.name}</span>
-          </nav>
-
-          {chapters.length === 0 ? (
-            <div className="glass-card p-8 text-center">
-              <p className="text-muted-foreground">No chapters available yet.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {chapters.map((chapter, index) => (
-                <Link
-                  key={chapter.id}
-                  to={`/Hadiths/${collectionId}/${chapter.id}`}
-                  className="block glass-card p-4 transition-all hover:scale-[1.01]"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <span className="flex items-center justify-center w-10 h-10 glass-btn text-primary font-bold text-sm">
-                        {index + 1}
-                      </span>
-                      <p className="font-semibold text-foreground">{chapter.name}</p>
-                    </div>
-                    {chapter.hadithRange && (
-                      <span className="glass-btn px-3 py-1.5 text-xs text-muted-foreground flex-shrink-0">
-                        {chapter.hadithRange}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
-      </section>
+      )}
     </Layout>
   );
 };
 
-export default HadithCollection;
+export default Hadith_Collection;

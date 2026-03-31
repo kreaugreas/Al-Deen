@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/Top/Component/UI/scroll-area";
-import { useApp } from "@/Middle/Context/App-Context";
-import { useAuth } from "@/Middle/Context/Auth-Context";
+import { Button } from "@/Top/Component/UI/Button";
+import { useApp } from "@/Middle/Context/App";
+import { useAuth } from "@/Middle/Context/Auth";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { useIsMobile } from "@/Middle/Hook/Use-Mobile";
 import { toast } from "sonner";
@@ -73,27 +74,30 @@ export function SettingsSidebar({ compact = false }: SettingsSidebarProps) {
                 {SETTINGS_CATEGORIES.map((cat) => {
                   const Icon = CATEGORY_ICONS[cat.icon as keyof typeof CATEGORY_ICONS];
                   return (
-                    <button
+                    <Button
                       key={cat.id}
                       onClick={() => { setActiveCategory(cat.id); setShowMobileMenu(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-4 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                      className="w-full flex items-center justify-between gap-3 h-auto"
+                      fullWidth
                     >
-                      <Icon className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm font-medium text-foreground flex-1">{cat.label}</span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </button>
+                      <div className="flex items-center gap-3">
+                        <Icon className="h-5 w-5" />
+                        <span className="text-sm font-medium">{cat.label}</span>
+                      </div>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   );
                 })}
               </div>
             ) : (
               <div>
-                <button
+                <Button
                   onClick={() => setShowMobileMenu(true)}
-                  className="flex items-center gap-2 mb-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-2 mb-4 h-auto p-0 bg-transparent hover:bg-transparent"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Settings</span>
-                </button>
+                </Button>
                 <h2 className="text-lg font-semibold text-foreground mb-4">
                   {SETTINGS_CATEGORIES.find(c => c.id === activeCategory)?.label}
                 </h2>
@@ -114,20 +118,20 @@ export function SettingsSidebar({ compact = false }: SettingsSidebarProps) {
             <div className="space-y-1 flex-1 py-8">
               {SETTINGS_CATEGORIES.map((cat) => {
                 const Icon = CATEGORY_ICONS[cat.icon as keyof typeof CATEGORY_ICONS];
+                const isActive = activeCategory === cat.id;
                 return (
-                  <button
+                  <Button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
                     className={cn(
-                      "w-full flex items-center gap-2.5 rounded-full px-3 py-2.5 text-left transition-all cursor-pointer",
-                      activeCategory === cat.id
-                        ? "bg-primary/15 text-primary"
-                        : "hover:bg-muted/50 text-foreground"
+                      "w-full flex items-center gap-2.5 h-auto",
+                      isActive && "bg-black dark:bg-white text-white dark:text-black"
                     )}
+                    fullWidth
                   >
-                    <Icon className={cn("h-4 w-4 shrink-0", activeCategory === cat.id ? "text-primary" : "text-muted-foreground")} />
+                    <Icon className="h-4 w-4 shrink-0" />
                     <span className="text-sm font-medium">{cat.label}</span>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
