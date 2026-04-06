@@ -9,12 +9,12 @@ import {
 import { cn } from "@/Middle/Library/utils";
 import { Button } from "@/Top/Component/UI/Button";
 import { Container } from "@/Top/Component/UI/Container";
-import { Slider } from "@/Top/Component/UI/slider";
+import { Slider } from "@/Top/Component/UI/Slider";
 import type { AudioPlayerMainProps } from "./Types";
 import { formatTime } from "./Utility";
 import { Settings } from "./Settings";
 
-// Timeline component (unchanged)
+// Timeline component with labels on sides
 const Timeline = ({
   progress,
   currentTime,
@@ -26,32 +26,20 @@ const Timeline = ({
   duration: number;
   onSeek: (value: number[]) => void;
 }) => (
-  <div className="w-full">
+  <div className="flex items-center gap-2 w-full">
+    <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
+      {formatTime(currentTime)}
+    </span>
     <Slider
       value={[progress]}
       max={100}
       step={0.1}
       onValueChange={onSeek}
-      className={cn(
-        "w-full cursor-pointer",
-        "[&>span:first-child]:h-1",
-        "[&>span:first-child]:bg-muted",
-        "[&>span:first-child>span]:bg-primary",
-        "[&_[role=slider]]:h-3",
-        "[&_[role=slider]]:w-3",
-        "[&_[role=slider]]:border-0",
-        "[&_[role=slider]]:bg-primary",
-        "[&_[role=slider]]:shadow-sm"
-      )}
+      className="flex-1"
     />
-    <div className="flex justify-between mt-1">
-      <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
-        {formatTime(currentTime)}
-      </span>
-      <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
-        {formatTime(duration)}
-      </span>
-    </div>
+    <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
+      {formatTime(duration)}
+    </span>
   </div>
 );
 
@@ -97,7 +85,7 @@ export const AudioPlayerMain = ({
           />
 
           {trackTitle && (
-            <div className="mt-1 text-xs font-medium truncate text-center">
+            <div className="mt-2 text-xs font-medium truncate text-center">
               {trackTitle}
             </div>
           )}
@@ -166,24 +154,27 @@ export const AudioPlayerMain = ({
       className="fixed bottom-0 left-0 right-0 z-[9999] px-4"
       style={{ paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="w-full max-w-2xl mx-auto">
-        <div className="flex justify-end mb-1">
-          <Button
-            size="sm"
-            className="w-7 h-7 p-0 rounded-full shadow-lg"
-            onClick={onToggleMinimize}
-            title="Expand player"
-          >
-            <ChevronUp className="h-3 w-3" />
-          </Button>
-        </div>
+      {/* Minimize button outside - floating above */}
+      <div className="flex justify-end mb-1">
+        <Button
+          size="sm"
+          className="w-7 h-7 p-0 rounded-full shadow-lg"
+          onClick={onToggleMinimize}
+          title="Expand player"
+        >
+          <ChevronUp className="h-3 w-3" />
+        </Button>
+      </div>
+      
+      {/* Timeline with labels on sides */}
+      <Container className="!py-2 !px-3 shadow-lg">
         <Timeline
           progress={progress}
           currentTime={currentTime}
           duration={duration}
           onSeek={onSeek}
         />
-      </div>
+      </Container>
     </div>
   );
 };

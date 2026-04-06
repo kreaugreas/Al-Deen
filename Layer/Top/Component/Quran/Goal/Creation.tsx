@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { ChevronRight, ChevronLeft, Loader2, Repeat, Calendar, Clock, Book, Settings, Target } from "lucide-react";
 import { cn } from "@/Middle/Library/utils";
-import { Input } from "@/Top/Component/UI/input";
-import { Label } from "@/Top/Component/UI/label";
+import { Input } from "@/Top/Component/UI/Input";
+import { Label } from "@/Top/Component/UI/Label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Top/Component/UI/select";
+} from "@/Top/Component/UI/Select";
 import { GOAL_PRESETS, type GoalPreset } from "@/Middle/Hook/Use-Quran-Goals";
 import { surahList } from "@/Bottom/API/Quran";
 

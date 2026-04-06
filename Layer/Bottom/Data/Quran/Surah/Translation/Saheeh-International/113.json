@@ -1,10 +1,7 @@
-{
-  "ID": 113,
-  "Ayah": [
-    { "Kalima": ["Say,", "I seek refuge", "in the Lord", "of daybreak,"] },
-    { "Kalima": ["From the evil", "of that which", "He created,"] },
-    { "Kalima": ["And from the evil", "of darkness", "when it settles,"] },
-    { "Kalima": ["And from the evil", "of the blowers", "in knots,"] },
-    { "Kalima": ["And from the evil", "of an envier", "when he envies."] }
-  ]
-}
+[
+  "Say, I seek refuge in the Lord of daybreak,",
+  "From the evil of that which He created,",
+  "And from the evil of darkness when it settles,",
+  "And from the evil of the blowers in knots,",
+  "And from the evil of an envier when he envies."
+]

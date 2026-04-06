@@ -1,5 +1,5 @@
 // ============= Vite / Next.js (Turbopack) =============
-const duaModules = import.meta.glob<{ default: DuaCategory }>(
+const duaModules = import.meta.glob<{ default: string[][] }>(
   "@/Bottom/Data/Aid/Dua/*.json",
   { eager: true }
 );
@@ -10,6 +10,7 @@ const tajweedModules = import.meta.glob<{ default: TajweedCategory }>(
 );
 
 import alphabetData from "@/Bottom/Data/Aid/Alphabet/Letter.json";
+import { nanoid } from 'nanoid';
 
 // ============= Tajweed Types =============
 
@@ -71,7 +72,6 @@ export interface Letter {
 // ============= Dua Types =============
 
 export interface DuaItem {
-  id: number;
   arabic: string;
   translation: string;
   reference: string;
@@ -79,12 +79,17 @@ export interface DuaItem {
 }
 
 export interface DuaCategory {
-  id: string;
   name: string;
-  arabicName: string;
-  icon: string;
-  description: string;
   duas: DuaItem[];
+}
+
+// ============= Helper Functions =============
+
+function formatNameFromId(filename: string): string {
+  return filename
+    .split("-")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 // ============= Tajweed Data =============
@@ -113,10 +118,32 @@ const tajweedCategories: TajweedCategory[] = tajweedIntros.map((intro) => ({
 
 // ============= Dua Data =============
 // Automatically loads every *.json file inside the Dua folder.
-// No manual import needed when you add a new file.
+// Each file should contain an array of arrays: [[arabic, translation, reference], ...]
 
-const duaCategories: DuaCategory[] = Object.values(duaModules).map(
-  (mod) => mod.default as DuaCategory
+const duaCategories: DuaCategory[] = Object.entries(duaModules).map(
+  ([path, mod]) => {
+    const filename = path.split("/").pop()?.replace(".json", "") || "";
+    const duasArray = mod.default;
+    
+    // Validate format
+    if (!Array.isArray(duasArray) || (duasArray.length > 0 && !Array.isArray(duasArray[0]))) {
+      console.error(`Invalid format in ${filename}. Expected array of arrays.`);
+      return {
+        name: formatNameFromId(filename),
+        duas: [],
+      };
+    }
+    
+    return {
+  name: formatNameFromId(filename),
+  duas: duasArray.map((dua: string[]) => ({
+    id: nanoid(),
+    arabic: dua[0],
+    translation: dua[1],
+    reference: dua[2],
+  })),
+};
+  }
 );
 
 // ============= Tajweed API =============
@@ -153,25 +180,26 @@ export function getLetter(id: string): Letter | null {
 
 export { duaCategories };
 
-export function getDuaCategory(categoryId: string): DuaCategory | null {
-  return duaCategories.find((c) => c.id === categoryId) ?? null;
+export function getDuaCategory(categoryName: string): DuaCategory | null {
+  return duaCategories.find((c) => c.name === categoryName) ?? null;
 }
 
 export function getAllDuaCategories(): DuaCategory[] {
   return duaCategories;
 }
 
-export function searchDuas(query: string): (DuaItem & { categoryId: string })[] {
+export function searchDuas(query: string): (DuaItem & { categoryName: string; duaIndex: number })[] {
   const lower = query.toLowerCase();
-  const results: (DuaItem & { categoryId: string })[] = [];
+  const results: (DuaItem & { categoryName: string; duaIndex: number })[] = [];
   for (const cat of duaCategories) {
-    for (const item of cat.duas) {
+    for (let i = 0; i < cat.duas.length; i++) {
+      const item = cat.duas[i];
       if (
         item.translation.toLowerCase().includes(lower) ||
         item.arabic.includes(query) ||
         item.reference.toLowerCase().includes(lower)
       ) {
-        results.push({ ...item, categoryId: cat.id });
+        results.push({ ...item, categoryName: cat.name, duaIndex: i });
       }
     }
   }

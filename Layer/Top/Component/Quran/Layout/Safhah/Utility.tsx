@@ -6,15 +6,51 @@ import { Tooltip } from "@/Top/Component/UI/Tooltip";
 import type { WordTooltipProps } from "./Types";
 
 export function WordTooltip({ 
-  translation, 
+  translation,
+  transliteration,
   enabled, 
   onClick, 
   onMouseEnter, 
   onMouseLeave, 
   children 
 }: WordTooltipProps) {
+  let tooltipContent: React.ReactNode = null;
+  
+  if (translation && transliteration) {
+    // Both exist - Translation above (black), Transliteration below (grey)
+    tooltipContent = (
+      <div className="space-y-0.5">
+        <div className="text-black dark:text-white text-sm">
+          {translation}
+        </div>
+        <div className="text-gray-500 dark:text-gray-400 text-xs">
+          {transliteration}
+        </div>
+      </div>
+    );
+  } else if (translation) {
+    // Only translation
+    tooltipContent = (
+      <div className="text-black dark:text-white text-sm">
+        {translation}
+      </div>
+    );
+  } else if (transliteration) {
+    // Only transliteration
+    tooltipContent = (
+      <div className="text-gray-500 dark:text-gray-400 text-sm">
+        {transliteration}
+      </div>
+    );
+  }
+  
   return (
-    <Tooltip content={translation} enabled={enabled} side="top" offset={20}>
+    <Tooltip 
+      content={tooltipContent} 
+      enabled={enabled && !!tooltipContent} 
+      side="top" 
+      offset={48}  // Increased from 32 to 48 for even higher position
+    >
       <span
         onClick={onClick}
         onMouseEnter={onMouseEnter}

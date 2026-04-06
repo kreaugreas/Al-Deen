@@ -1,15 +1,7 @@
-{
-  "id": "before-leaving-masjid",
-  "name": "Before Leaving Masjid",
-  "arabicName": "عند الخروج من المسجد",
-  "icon": "mosque",
-  "description": "Dua to recite before leaving the masjid",
-  "duas": [
-    {
-      "id": 1,
-      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
-      "translation": "O Allah, I ask You from Your bounty.",
-      "reference": "Muslim"
-    }
+[
+  [
+    "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+    "O Allah, I ask You from Your bounty.",
+    "Muslim"
   ]
-}
+]

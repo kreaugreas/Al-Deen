@@ -1,8 +1,8 @@
 import { Layout } from "@/Top/Component/Layout/Index";
 import { Button } from "@/Top/Component/UI/button";
-import { Textarea } from "@/Top/Component/UI/textarea";
-import { Input } from "@/Top/Component/UI/input";
-import { Label } from "@/Top/Component/UI/label";
+import { Textarea } from "@/Top/Component/UI/Textarea";
+import { Input } from "@/Top/Component/UI/Input";
+import { Label } from "@/Top/Component/UI/Label";
 import { MessageSquare, Bug, Lightbulb, Heart } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/Middle/Hook/Use-Toast";

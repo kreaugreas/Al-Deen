@@ -1,15 +1,7 @@
-{
-  "id": "before-eating",
-  "name": "Before Eating",
-  "arabicName": "قبل الأكل",
-  "icon": "utensils",
-  "description": "Dua to recite before eating",
-  "duas": [
-    {
-      "id": 1,
-      "arabic": "بِسْمِ اللَّهِ",
-      "translation": "In the name of Allah.",
-      "reference": "Bukhari"
-    }
+[
+  [
+    "بِسْمِ اللَّهِ",
+    "In the name of Allah.",
+    "Bukhari"
   ]
-}
+]

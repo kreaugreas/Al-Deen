@@ -7,6 +7,8 @@ import { useReadingProgress } from "@/Middle/Hook/Use-Reading-Progress";
 import { surahList, juzData } from "@/Bottom/API/Quran";
 import { supabase } from "@/Bottom/Integration/Supabase/client";
 import { Loader2 } from "lucide-react";
+import { Container } from "@/Top/Component/UI/Container";
+import { Button } from "@/Top/Component/UI/Button";
 import { Active } from "@/Top/Component/Quran/Goal/Active";
 import { Creation } from "@/Top/Component/Quran/Goal/Creation";
 import type { Goal_Progress } from "@/Top/Component/Quran/Goal/Types";
@@ -74,7 +76,9 @@ export default function Goal() {
     return (
       <Layout>
         <div className="min-h-[80vh] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Container className="!p-8">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </Container>
         </div>
       </Layout>
     );

@@ -9,15 +9,12 @@ import order from "@/Bottom/Data/Quran/Meta/Revelation/Order.json";
 
 export type QuranFontType = "Standard" | "V1" | "V2";
 
-export interface SurahData {
-  ID: number;
-  Ayah: string[];
-}
+export type SurahData = string[];
 
-export interface TranslationData {
-  ID: number;
-  Ayah: { Kalima: string[] }[];
-}
+
+export type TranslationData = string[];
+
+export type KbkData = string[][];
 
 export type SurahLayout = string[][];
 
@@ -26,6 +23,8 @@ export interface AssembledVerse {
   arabic: string;
   words: string[];
   translation?: string;
+  transliteration?: string;           // Changed from string[] to string
+  wbwTransliteration?: string[];      // Kept as string[] for word-by-word
   wbwTranslation?: string[];
 }
 
@@ -309,15 +308,22 @@ export const juzData: JuzInfo[] = Object.entries(juzGroups).map(([juz, surahIds]
 
 // ============= Revelation order array (for backward compatibility) =============
 export const revelationOrder: number[] = Array.isArray(order) ? order : [];
+export type TransliterationData = string[][]; // word-by-word per verse
 
 // ============= Cache =============
 const cache = {
   surah:       new Map<string, SurahData>(),
   translation: new Map<string, TranslationData>(),
+  transliteration: new Map<string, TransliterationData>(), // NEW
+  kbk:         new Map<string, KbkData>(),
   layout:      new Map<number, SurahLayout | null>(),
   timestamps:  new Map<string, string[][] | string[] | null>(),
 };
-
+// Add with other glob modules
+const transliterationModules = import.meta.glob(
+  '@/Bottom/Data/Quran/Surah/Transliteration/*/*.json',
+  { import: 'default', eager: false }
+);
 // ============= Glob Modules =============
 const surahAudioModules = import.meta.glob(
   '@/Bottom/Data/Quran/Qiraat/*/Surah/*/Audio.mp3',
@@ -367,20 +373,35 @@ async function loadSurah(surahId: number, fontType: QuranFontType = "Standard"):
   const key = `${fontType}-${surahId}`;
   if (cache.surah.has(key)) return cache.surah.get(key)!;
 
-  let data: SurahData;
+  let data: any;
   switch (fontType) {
     case "V1":
-      data = await import(`@/Bottom/Data/Quran/Surah/Glyph-Encoded/Positional-Forms/${surahId}.json`);
+      data = await import(`@/Bottom/Data/Quran/Surah/Presentation-Form/B/${surahId}.json`);
       break;
     case "V2":
-      data = await import(`@/Bottom/Data/Quran/Surah/Glyph-Encoded/Ligatures/${surahId}.json`);
+      data = await import(`@/Bottom/Data/Quran/Surah/Presentation-Form/A/${surahId}.json`);
       break;
     default:
       data = await import(`@/Bottom/Data/Quran/Surah/${surahId}.json`);
       break;
   }
-  cache.surah.set(key, data);
-  return data;
+  
+  // Extract the array from default export if needed
+  const raw = data.default ?? data;
+  
+  // Handle both old and new formats
+  let result: string[];
+  if (Array.isArray(raw)) {
+    result = raw;
+  } else if (raw && typeof raw === 'object' && 'Ayah' in raw && Array.isArray(raw.Ayah)) {
+    result = raw.Ayah;
+  } else {
+    console.error(`Invalid surah format for ${surahId}:`, raw);
+    result = [];
+  }
+  
+  cache.surah.set(key, result);
+  return result;
 }
 
 async function loadTranslation(surahId: number, source: TranslationSource): Promise<TranslationData | null> {
@@ -389,7 +410,41 @@ async function loadTranslation(surahId: number, source: TranslationSource): Prom
   try {
     const module = await import(`@/Bottom/Data/Quran/Surah/Translation/${source}/${surahId}.json`);
     const data: TranslationData = module.default ?? module;
+    // data is now directly the array of strings
     cache.translation.set(key, data);
+    return data;
+  } catch {
+    return null;
+  }
+}
+async function loadTransliteration(
+  surahId: number, 
+  style: string = "Academic" // or "Phonetic", "KingFahd", etc.
+): Promise<TransliterationData | null> {
+  const key = `${style}-${surahId}`;
+  if (cache.transliteration.has(key)) return cache.transliteration.get(key)!;
+  
+  try {
+    // Dynamic import based on style and surah ID
+    const module = await import(
+      `@/Bottom/Data/Quran/Surah/Transliteration/${style}/${surahId}.json`
+    );
+    const data: TransliterationData = module.default ?? module;
+    cache.transliteration.set(key, data);
+    return data;
+  } catch (error) {
+    console.warn(`Transliteration not found: ${style}/${surahId}.json`, error);
+    return null;
+  }
+}
+
+async function loadKbk(surahId: number): Promise<KbkData | null> {
+  const key = `kbk-${surahId}`;
+  if (cache.kbk.has(key)) return cache.kbk.get(key)!;
+  try {
+    const module = await import(`@/Bottom/Data/Quran/Surah/Translation/KBK/${surahId}.json`);
+    const data: KbkData = module.default ?? module;
+    cache.kbk.set(key, data);
     return data;
   } catch {
     return null;
@@ -479,32 +534,44 @@ export async function getAyahTimestamps(surahId: number, ayahNumber: number, rec
 }
 
 // ============= Main API =============
+// In @/Bottom/API/Quran (Quran.ts)
 export async function getSurah(
   surahId: number,
   options: {
     translation?: TranslationSource;
     wbw?: boolean;
     fontType?: QuranFontType;
+    transliteration?: string;        // verse-level transliteration style
+    wbwTransliteration?: string;     // word-by-word transliteration style
   } = {}
 ): Promise<AssembledSurah> {
   const fontType = options.fontType ?? "Standard";
 
-  const [surahData, translationData, layoutData] = await Promise.all([
+  const [surahData, translationData, transliterationData, wbwTransliterationData, kbkData, layoutData] = await Promise.all([
     loadSurah(surahId, fontType),
-    options.translation || options.wbw
-      ? loadTranslation(surahId, options.translation ?? "Direct")
-      : Promise.resolve(null),
+    options.translation ? loadTranslation(surahId, options.translation) : Promise.resolve(null),
+    options.transliteration ? loadTransliteration(surahId, options.transliteration) : Promise.resolve(null),
+    options.wbwTransliteration ? loadTransliteration(surahId, options.wbwTransliteration) : Promise.resolve(null), // Use same loader
+    options.wbw ? loadKbk(surahId) : Promise.resolve(null),
     loadLayout(surahId),
   ]);
 
-  const verses: AssembledVerse[] = surahData.Ayah.map((arabic, index) => {
-    const kalima = translationData?.Ayah[index]?.Kalima;
+  const verses: AssembledVerse[] = surahData.map((arabic, index) => {
+    const verseIndex = index;
     return {
       verseNumber: index + 1,
       arabic,
       words: fontType === "V1" ? arabic.split("") : arabic.split(" "),
-      ...(kalima && options.translation && { translation: kalima.join(" ") }),
-      ...(kalima && options.wbw && { wbwTranslation: kalima }),
+      ...(translationData && { translation: translationData[index] }),
+      // Join array into string for verse-level transliteration
+      ...(transliterationData && transliterationData[verseIndex] && { 
+        transliteration: transliterationData[verseIndex].join(" ")
+      }),
+      // Keep as array for word-by-word
+      ...(wbwTransliterationData && wbwTransliterationData[verseIndex] && {
+        wbwTransliteration: wbwTransliterationData[verseIndex]
+      }),
+      ...(kbkData && kbkData[index] && { wbwTranslation: kbkData[index] }),
     };
   });
 

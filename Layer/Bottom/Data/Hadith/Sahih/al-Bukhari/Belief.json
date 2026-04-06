@@ -1,45 +1,34 @@
-{
-  "id": "belief",
-  "name": "Belief",
-  "arabicName": "كتاب الإيمان",
-  "hadithRange": "8 to 58",
-  "hadithCount": 51,
-  "hadiths": [
-    {
-      "id": 8,
-      "arabic": "بُنِيَ الإِسْلَامُ عَلَى خَمْسٍ: شَهَادَةِ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَإِقَامِ الصَّلَاةِ، وَإِيتَاءِ الزَّكَاةِ، وَالْحَجِّ، وَصَوْمِ رَمَضَانَ",
-      "transliteration": "Buniya al-Islaamu 'alaa khamsin: shahaadati an laa ilaaha illallaahu wa anna Muhammadan Rasulullah, wa iqaamis-salaati, wa eetaa'iz-zakaati, wal-hajji, wa sawmi Ramadaan",
-      "translation": "Islam is built upon five pillars: testifying that there is no god but Allah and that Muhammad is the Messenger of Allah, performing the prayers, paying the Zakat, making the pilgrimage to the House, and fasting in Ramadan.",
-      "narrator": "Abdullah ibn Umar",
-      "reference": "Sahih al-Bukhari 8",
-      "grade": "Sahih"
-    },
-    {
-      "id": 15,
-      "arabic": "لاَ يُؤْمِنُ أَحَدُكُمْ حَتَّى أَكُونَ أَحَبَّ إِلَيْهِ مِنْ وَالِدِهِ وَوَلَدِهِ وَالنَّاسِ أَجْمَعِينَ",
-      "transliteration": "Laa yu'minu ahadukum hattaa akoona ahabba ilaihi min waalidinhi wa waladihi wan-naasi ajma'een",
-      "translation": "None of you will have faith till he loves me more than his father, his children and all mankind.",
-      "narrator": "Anas bin Malik",
-      "reference": "Sahih al-Bukhari 15",
-      "grade": "Sahih"
-    },
-    {
-      "id": 24,
-      "arabic": "أَفْضَلُ الإِسْلَامِ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ",
-      "transliteration": "Afdalul-Islaami man salimal-Muslimoona min lisaanihi wa yadihi",
-      "translation": "The best of Muslims is the one from whose tongue and hand other Muslims are safe.",
-      "narrator": "Abdullah ibn Amr",
-      "reference": "Sahih al-Bukhari 11",
-      "grade": "Sahih"
-    },
-    {
-      "id": 25,
-      "arabic": "الإِيمَانُ بِضْعٌ وَسِتُّونَ شُعْبَةً، وَالْحَيَاءُ شُعْبَةٌ مِنَ الإِيمَانِ",
-      "transliteration": "Al-eemaanu bid'un wa sittoona shu'bah, wal-hayaa'u shu'batun minal-eemaan",
-      "translation": "Faith consists of more than sixty branches, and modesty is a branch of faith.",
-      "narrator": "Abu Hurairah",
-      "reference": "Sahih al-Bukhari 9",
-      "grade": "Sahih"
-    }
+[
+  [
+    "بُنِيَ الإِسْلَامُ عَلَى خَمْسٍ: شَهَادَةِ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَإِقَامِ الصَّلَاةِ، وَإِيتَاءِ الزَّكَاةِ، وَالْحَجِّ، وَصَوْمِ رَمَضَانَ",
+    "Buniya al-Islāmu 'alā khamsin: shahādati an lā ilāha illallāhu wa anna Muhammadan rasūlullāhi, wa iqāmi aṣ-ṣalāti, wa ītā'i az-zakāti, wa al-ḥajji, wa ṣawmi ramaḍān",
+    "Islam is built upon five pillars: testifying that there is no god but Allah and that Muhammad is the Messenger of Allah, performing the prayers, paying the Zakat, making the pilgrimage to the House, and fasting in Ramadan.",
+    ["Islam", "is built", "upon", "five", "testifying", "that", "there is no god", "but Allah", "and that", "Muhammad", "is the Messenger", "of Allah", "performing", "the prayers", "paying", "the Zakat", "making", "the pilgrimage", "to the House", "and", "fasting", "in Ramadan"],
+    "Abdullah ibn Umar",
+    8
+  ],
+  [
+    "لاَ يُؤْمِنُ أَحَدُكُمْ حَتَّى أَكُونَ أَحَبَّ إِلَيْهِ مِنْ وَالِدِهِ وَوَلَدِهِ وَالنَّاسِ أَجْمَعِينَ",
+    "Lā yu'minu aḥadukum ḥattā akūna aḥabba ilayhi min wālidihi wa waladihi wa an-nāsi ajma'īn",
+    "None of you will have faith till he loves me more than his father, his children and all mankind.",
+    ["None", "of you", "will have faith", "till", "he loves me", "more than", "his father", "his children", "and", "all mankind"],
+    "Anas bin Malik",
+    15
+  ],
+  [
+    "أَفْضَلُ الإِسْلَامِ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ",
+    "Afḍalu al-islāmi man salima al-muslimūna min lisānihi wa yadihi",
+    "The best of Muslims is the one from whose tongue and hand other Muslims are safe.",
+    ["The best", "of Muslims", "is the one", "from whose", "tongue", "and", "hand", "other Muslims", "are safe"],
+    "Abdullah ibn Amr",
+    11
+  ],
+  [
+    "الإِيمَانُ بِضْعٌ وَسِتُّونَ شُعْبَةً، وَالْحَيَاءُ شُعْبَةٌ مِنَ الإِيمَانِ",
+    "Al-īmānu biḍ'un wa sittūna shu'bah, wal-ḥayā'u shu'batun mina al-īmān",
+    "Faith consists of more than sixty branches, and modesty is a branch of faith.",
+    ["Faith", "consists of", "more than", "sixty", "branches", "and", "modesty", "is a branch", "of faith"],
+    "Abu Hurairah",
+    9
   ]
-}
+]

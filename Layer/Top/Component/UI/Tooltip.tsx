@@ -18,11 +18,11 @@ export function Tooltip({
   enabled = true, 
   className,
   side = "top",
-  offset = 16
+  offset = 12
 }: TooltipProps) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
-  const triggerRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLSpanElement>(null);
 
   const updatePosition = () => {
     if (triggerRef.current) {
@@ -54,7 +54,7 @@ export function Tooltip({
   };
 
   useEffect(() => {
-    if (showTooltip && triggerRef.current) {
+    if (showTooltip) {
       updatePosition();
       window.addEventListener("resize", updatePosition);
       window.addEventListener("scroll", updatePosition);
@@ -65,16 +65,14 @@ export function Tooltip({
     }
   }, [showTooltip, side]);
 
-  if (!enabled) {
+  if (!enabled || !content) {
     return <>{children}</>;
   }
 
   const trigger = (
     <span
       ref={triggerRef}
-      onMouseEnter={() => {
-        setShowTooltip(true);
-      }}
+      onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => {
         setShowTooltip(false);
         setPos(null);
@@ -85,7 +83,7 @@ export function Tooltip({
     </span>
   );
 
-  const tooltipContent = showTooltip && content && pos && createPortal(
+  const tooltipContent = showTooltip && pos && createPortal(
     <div
       style={{
         position: "fixed",
@@ -94,17 +92,21 @@ export function Tooltip({
         transform: side === "top" || side === "bottom" ? "translateX(-50%)" : "translateY(-50%)",
         zIndex: 9999,
         pointerEvents: "none",
+        maxWidth: "300px",
+        minWidth: "100px",
       }}
     >
-      <span
+      <div
         className={cn(
-          "px-3 py-1.5 text-xs font-medium rounded-[40px] whitespace-nowrap",
-          "bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white",
+          "px-4 py-2 text-sm rounded-full text-center",  // Changed to rounded-full for maximum rounded corners
+          "bg-white dark:bg-black text-black dark:text-white",
+          "border-2 border-black dark:border-white",
+          "shadow-lg",
           className
         )}
       >
         {content}
-      </span>
+      </div>
     </div>,
     document.body
   );

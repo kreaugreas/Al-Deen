@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, memo } from "react";
-import { Textarea } from "@/Top/Component/UI/textarea";
+import { Textarea } from "@/Top/Component/UI/Textarea";
 import { useNotes } from "@/Middle/Hook/Use-Notes";
 import { useAuth } from "@/Middle/Context/Auth";
 import { surahList } from "@/Bottom/API/Quran";
@@ -7,7 +7,7 @@ import { Loader2, Save, Trash2, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/Middle/Hook/Use-Mobile";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
-import { ScrollArea } from "@/Top/Component/UI/scroll-area";
+import { ScrollArea } from "@/Top/Component/UI/Scroll-Area";
 import { Container } from "@/Top/Component/UI/Container";
 import { Button } from "@/Top/Component/UI/Button";
 import { useApp } from "@/Middle/Context/App";

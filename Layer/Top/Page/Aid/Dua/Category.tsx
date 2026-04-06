@@ -7,14 +7,21 @@ import { Button } from "@/Top/Component/UI/Button";
 import { Container } from "@/Top/Component/UI/Container";
 
 const COLLECTION_MAP: Record<string, { name: string; route: string }> = {
-  bukhari: { name: "Sahih al-Bukhari", route: "/Hadiths/bukhari" },
-  muslim: { name: "Sahih Muslim", route: "/Hadiths/muslim" },
+  bukhari: { name: "Sahih al-Bukhari", route: "/Hadiths/Bukhari" },
+  muslim: { name: "Sahih Muslim", route: "/Hadiths/Muslim" },
   "abu dawud": { name: "Abu Dawud", route: "/Hadiths/abu-dawud" },
   tirmidhi: { name: "Tirmidhi", route: "/Hadiths/tirmidhi" },
   "ibn majah": { name: "Ibn Majah", route: "/Hadiths/ibn-majah" },
   ahmad: { name: "Musnad Ahmad", route: "/Hadiths/ahmad" },
   nasa_i: { name: "An-Nasa'i", route: "/Hadiths/nasai" },
 };
+
+function formatNameFromId(id: string): string {
+  return id
+    .split("-")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 function ReferenceLink({ reference }: { reference: string }) {
   if (reference.toLowerCase().startsWith("quran")) {
@@ -47,7 +54,10 @@ function ReferenceLink({ reference }: { reference: string }) {
 
 const Dua_Category = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
-  const category = categoryId ? getDuaCategory(categoryId) : null;
+  
+  // Convert categoryId (e.g., "after-eating") to categoryName (e.g., "After Eating")
+  const categoryName = categoryId ? formatNameFromId(categoryId) : "";
+  const category = categoryName ? getDuaCategory(categoryName) : null;
 
   if (!category) {
     return (
@@ -66,12 +76,12 @@ const Dua_Category = () => {
     );
   }
 
-  const handleCopy = (dua: DuaItem) => {
+  const handleCopy = (dua: DuaItem, index: number) => {
     navigator.clipboard.writeText(`${dua.arabic}\n\n${dua.translation}\n\n— ${dua.reference}`);
     toast({ title: "Copied", description: "Dua copied to clipboard" });
   };
 
-  const handleShare = async (dua: DuaItem) => {
+  const handleShare = async (dua: DuaItem, index: number) => {
     const text = `${dua.arabic}\n\n${dua.translation}\n\n— ${dua.reference}`;
     if (navigator.share) {
       try {
@@ -95,24 +105,24 @@ const Dua_Category = () => {
             </Container>
 
             <div className="space-y-5">
-              {category.duas.map((dua: DuaItem) => (
-                <Container key={dua.id} className="p-5 space-y-4 group">
+              {category.duas.map((dua: DuaItem, index: number) => (
+                <Container key={index} className="p-5 space-y-4 group">
                   <div className="flex items-center justify-between">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-muted text-primary text-xs font-semibold group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-                      {dua.id}
+                      {index + 1}
                     </span>
                     <div className="flex items-center gap-1">
                       <Button
                         size="sm"
                         className="w-7 h-7 p-0"
-                        onClick={() => handleCopy(dua)}
+                        onClick={() => handleCopy(dua, index)}
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
                       <Button
                         size="sm"
                         className="w-7 h-7 p-0"
-                        onClick={() => handleShare(dua)}
+                        onClick={() => handleShare(dua, index)}
                       >
                         <Share2 className="h-3.5 w-3.5" />
                       </Button>

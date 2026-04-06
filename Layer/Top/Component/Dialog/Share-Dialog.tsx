@@ -4,12 +4,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/Top/Component/UI/dialog";
-import { Button } from "@/Top/Component/UI/button";
-import { Input } from "@/Top/Component/UI/input";
+} from "@/Top/Component/UI/Dialog";
+import { Button } from "@/Top/Component/UI/Button";
+import { Input } from "@/Top/Component/UI/Input";
+import { Container } from "@/Top/Component/UI/Container";
 import { toast } from "@/Middle/Hook/Use-Toast";
 import { surahList } from "@/Bottom/API/Quran";
-import { Copy, Facebook, Twitter, MessageCircle, Link2, Check } from "lucide-react";
+import { Copy, Facebook, Twitter, MessageCircle, Link2, Check, X } from "lucide-react";
 
 interface ShareDialogProps {
   open: boolean;
@@ -66,95 +67,117 @@ export function ShareDialog({ open, onOpenChange, surahId, ayahId, verseText, tr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Share {verseRef}</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Verse preview */}
-          {verseText && (
-            <div className="bg-muted/50 p-4 rounded-lg border space-y-2">
-              <p className="text-right font-arabic text-lg" dir="rtl">
-                {verseText}
-              </p>
-              {translation && (
-                <p className="text-sm text-muted-foreground">{translation}</p>
-              )}
-              <p className="text-xs text-primary">- {verseRef}</p>
-            </div>
-          )}
-
-          {/* Share buttons */}
-          <div className="grid grid-cols-4 gap-3">
+      <DialogContent className="max-w-md p-0 bg-transparent border-0 shadow-none [&>button]:hidden">
+        <Container className="!py-5 !px-6">
+          <div className="flex items-center justify-between mb-4">
+            <DialogHeader className="p-0">
+              <DialogTitle className="text-lg font-semibold">
+                Share {verseRef}
+              </DialogTitle>
+            </DialogHeader>
             <Button
-              variant="outline"
-              className="flex flex-col gap-1 h-auto py-3"
-              onClick={copyVerse}
+              size="sm"
+              className="w-8 h-8 p-0 rounded-full"
+              onClick={() => onOpenChange(false)}
             >
-              {copied ? (
-                <Check className="h-5 w-5 text-green-500" />
-              ) : (
-                <Copy className="h-5 w-5" />
-              )}
-              <span className="text-xs">Copy</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="flex flex-col gap-1 h-auto py-3"
-              onClick={() => shareToSocial("twitter")}
-            >
-              <Twitter className="h-5 w-5" />
-              <span className="text-xs">Twitter</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="flex flex-col gap-1 h-auto py-3"
-              onClick={() => shareToSocial("facebook")}
-            >
-              <Facebook className="h-5 w-5" />
-              <span className="text-xs">Facebook</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="flex flex-col gap-1 h-auto py-3"
-              onClick={() => shareToSocial("whatsapp")}
-            >
-              <MessageCircle className="h-5 w-5" />
-              <span className="text-xs">WhatsApp</span>
+              <X className="h-4 w-4" />
             </Button>
           </div>
 
-          {/* Copy link */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Share Link</label>
-            <div className="flex gap-2">
-              <Input value={shareUrl} readOnly className="text-sm" />
-              <Button variant="outline" size="icon" onClick={() => copyToClipboard(shareUrl)}>
-                <Link2 className="h-4 w-4" />
+          <div className="space-y-5">
+            {/* Verse preview */}
+            {verseText && (
+              <div className="p-4 rounded-[40px] bg-muted/30 space-y-2">
+                <p className="text-right font-arabic text-lg leading-loose" dir="rtl">
+                  {verseText}
+                </p>
+                {translation && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">{translation}</p>
+                )}
+                <p className="text-xs text-primary font-medium">- {verseRef}</p>
+              </div>
+            )}
+
+            {/* Share buttons */}
+            <div className="grid grid-cols-4 gap-2">
+              <Button
+                variant="secondary"
+                className="flex flex-col gap-1 h-auto py-3"
+                onClick={copyVerse}
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+                <span className="text-xs">Copy</span>
+              </Button>
+              
+              <Button
+                variant="secondary"
+                className="flex flex-col gap-1 h-auto py-3"
+                onClick={() => shareToSocial("twitter")}
+              >
+                <Twitter className="h-4 w-4" />
+                <span className="text-xs">Twitter</span>
+              </Button>
+              
+              <Button
+                variant="secondary"
+                className="flex flex-col gap-1 h-auto py-3"
+                onClick={() => shareToSocial("facebook")}
+              >
+                <Facebook className="h-4 w-4" />
+                <span className="text-xs">Facebook</span>
+              </Button>
+              
+              <Button
+                variant="secondary"
+                className="flex flex-col gap-1 h-auto py-3"
+                onClick={() => shareToSocial("whatsapp")}
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span className="text-xs">WhatsApp</span>
               </Button>
             </div>
-          </div>
 
-          {/* Native share */}
-          {navigator.share && (
-            <Button
-              className="w-full"
-              onClick={() => {
-                navigator.share({
-                  title: verseRef,
-                  text: shareText,
-                  url: shareUrl,
-                });
-              }}
-            >
-              More sharing options
-            </Button>
-          )}
-        </div>
+            {/* Copy link */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Share Link</label>
+              <div className="flex gap-2">
+                <Input 
+                  value={shareUrl} 
+                  readOnly 
+                  className="text-sm bg-transparent border-2 border-black dark:border-white rounded-[40px] focus:outline-none focus:border-primary"
+                />
+                <Button 
+                  variant="secondary" 
+                  size="sm"
+                  className="w-9 h-9 p-0 rounded-full"
+                  onClick={() => copyToClipboard(shareUrl)}
+                >
+                  <Link2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Native share */}
+            {navigator.share && (
+              <Button
+                className="w-full"
+                onClick={() => {
+                  navigator.share({
+                    title: verseRef,
+                    text: shareText,
+                    url: shareUrl,
+                  });
+                }}
+              >
+                More sharing options
+              </Button>
+            )}
+          </div>
+        </Container>
       </DialogContent>
     </Dialog>
   );

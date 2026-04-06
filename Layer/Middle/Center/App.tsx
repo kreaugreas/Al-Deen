@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Toaster } from "@/Top/Component/UI/toaster";
-import { Toaster as Sonner } from "@/Top/Component/UI/sonner";
+import { Toaster } from "@/Top/Component/UI/Toaster";
+import { Toaster as Sonner } from "@/Top/Component/UI/Sonner";
 import { TooltipProvider } from "@/Top/Component/UI/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -14,7 +14,7 @@ import Index from "@/Top/Page/Index";
 
 // Quran
 const Quran        = lazy(() => import("@/Top/Page/Quran/Index"));
-const SurahIndex   = lazy(() => import("@/Top/Page/Quran/Surah/Index"));
+const Surah   = lazy(() => import("@/Top/Page/Quran/Surah/Index"));
 const JuzIndex   = lazy(() => import("@/Top/Page/Quran/Juz"));
 const HizbIndex   = lazy(() => import("@/Top/Page/Quran/Hizb"));
 const AyahIndex    = lazy(() => import("@/Top/Page/Quran/Surah/Ayah/Index"));
@@ -26,13 +26,11 @@ const QuranPage    = lazy(() => import("@/Top/Page/Quran/Safhah"));
 const Hadith          = lazy(() => import("@/Top/Page/Hadith/Index"));
 const Hadith_Collection = lazy(() => import("@/Top/Page/Hadith/Collection"));
 const Hadith_Chapter    = lazy(() => import("@/Top/Page/Hadith/Chapter"));
-
 // Aid
 const Aid              = lazy(() => import("@/Top/Page/Aid/Index"));
 const Dua              = lazy(() => import("@/Top/Page/Aid/Dua/Index"));
 const Dua_Category      = lazy(() => import("@/Top/Page/Aid/Dua/Category"));
-const AlphabetIndex    = lazy(() => import("@/Top/Page/Aid/Alphabet/Index"));
-const AlphabetLetter   = lazy(() => import("@/Top/Page/Aid/Alphabet/Letter"));
+const AlphabetIndex    = lazy(() => import("@/Top/Page/Aid/Alphabet"));
 const Tajweed      = lazy(() => import("@/Top/Page/Aid/Tajweed/Main"));
 const TajweedCategory  = lazy(() => import("@/Top/Page/Aid/Tajweed/Category"));
 const TajweedRule      = lazy(() => import("@/Top/Page/Aid/Tajweed/Rule"));
@@ -46,7 +44,7 @@ const Feedback       = lazy(() => import("@/Top/Page/Feedback"));
 const SignIn         = lazy(() => import("@/Top/Page/Auth/Sign-In"));
 const SignUp         = lazy(() => import("@/Top/Page/Auth/Sign-Up"));
 const ForgotPassword = lazy(() => import("@/Top/Page/Auth/Forgot-Password"));
-const SearchResults  = lazy(() => import("@/Top/Page/Search-Results"));
+const SearchResults  = lazy(() => import("@/Top/Page/Search"));
 const Not_Found       = lazy(() => import("@/Top/Page/404"));
 
 const queryClient = new QueryClient({
@@ -85,7 +83,7 @@ const App = () => (
 
                     {/* ── Quran ── */}
                     <Route path="/Quran"                                                      element={<Quran />} />
-                    <Route path="/Quran/Surah/:id"                                            element={<SurahIndex />} />
+                    <Route path="/Quran/Surah/:id"                                            element={<Surah />} />
                     <Route path="/Quran/Surah/:id/Ayah/:verseId"                              element={<AyahIndex />} />
                     <Route path="/Quran/Surah/:id/Ayah/:verseId/Kalima/:kalimaId"             element={<KalimaIndex />} />
                     <Route path="/Quran/Juz/:id"                                              element={<JuzIndex />} />
@@ -95,15 +93,14 @@ const App = () => (
 
                     {/* ── Hadith ── */}
                     <Route path="/Hadith"                                                    element={<Hadith />} />
-                    <Route path="/Hadith/:collectionId"                                      element={<Hadith_Collection />} />
-                    <Route path="/Hadith/:collectionId/:chapterId"                           element={<Hadith_Chapter />} />
+                    <Route path="/Hadith/:Collection"                                      element={<Hadith_Collection />} />
+                    <Route path="/Hadith/:Collection/:Chapter"                           element={<Hadith_Chapter />} />
 
                     {/* ── Aid ── */}
                     <Route path="/Aid"                                                        element={<Aid />} />
                     <Route path="/Aid/Dua"                                                    element={<Dua />} />
                     <Route path="/Aid/Dua/:categoryId"                                        element={<Dua_Category />} />
                     <Route path="/Aid/Alphabet"                                               element={<AlphabetIndex />} />
-                    <Route path="/Aid/Alphabet/:letterId"                                     element={<AlphabetLetter />} />
   <Route path="/Aid/Tajweed"                           element={<Tajweed />} />
                     <Route path="/Aid/Tajweed/:categoryId"                           element={<TajweedCategory />} />
                     <Route path="/Aid/Tajweed/:categoryId/:subcategoryId"            element={<TajweedRule />} />

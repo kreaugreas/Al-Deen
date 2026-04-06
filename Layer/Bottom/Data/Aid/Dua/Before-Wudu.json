@@ -1,15 +1,7 @@
-{
-  "id": "before-wudu",
-  "name": "Before Wudu",
-  "arabicName": "قبل الوضوء",
-  "icon": "droplets",
-  "description": "Dua to recite before performing wudu",
-  "duas": [
-    {
-      "id": 1,
-      "arabic": "بِسْمِ اللَّهِ",
-      "translation": "In the name of Allah.",
-      "reference": "Abu Dawud"
-    }
+[
+  [
+    "بِسْمِ اللَّهِ",
+    "In the name of Allah.",
+    "Abu Dawud"
   ]
-}
+]

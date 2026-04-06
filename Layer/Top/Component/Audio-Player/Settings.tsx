@@ -1,4 +1,4 @@
-import { Slider } from "@/Top/Component/UI/slider";
+import { Slider } from "@/Top/Component/UI/Slider";
 import {
   Repeat,
   ChevronLeft,
@@ -13,7 +13,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/Top/Component/UI/popover";
+} from "@/Top/Component/UI/Popover";
 import { Button } from "@/Top/Component/UI/Button"; // updated Button
 import type { SettingsMenu } from "./Types";
 import { getRepeatLabel, playbackSpeeds } from "./Utility";

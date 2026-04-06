@@ -1,11 +1,8 @@
-{
-  "ID": 114,
-  "Ayah": [
-    { "Kalima": ["Say,", "I seek refuge", "in the Lord", "of mankind,"] },
-    { "Kalima": ["The Sovereign", "of mankind,"] },
-    { "Kalima": ["The God", "of mankind,"] },
-    { "Kalima": ["From the evil", "of the retreating whisperer,"] },
-    { "Kalima": ["Who whispers", "into the breasts", "of mankind,"] },
-    { "Kalima": ["From among", "the jinn", "and mankind."] }
-  ]
-}
+[
+  "Say, I seek refuge in the Lord of mankind,",
+  "The Sovereign of mankind,",
+  "The God of mankind,",
+  "From the evil of the retreating whisperer,",
+  "Who whispers into the breasts of mankind,",
+  "From among the jinn and mankind."
+]

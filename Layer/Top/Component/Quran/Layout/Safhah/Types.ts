@@ -3,6 +3,7 @@ import type { AssembledSurah, AssembledVerse, SurahMeta } from "@/Bottom/API/Qur
 
 export interface WordTooltipProps {
   translation?: string;
+  transliteration?: string;  // ✅ ADDED
   enabled: boolean;
   onClick?: () => void;
   onMouseEnter?: () => void;
@@ -17,6 +18,7 @@ export interface ResolvedWord {
   isVerseEnd: boolean;
   isVerseNumber: boolean;
   verseNumber?: number;
+  transliteration?: string;  // ✅ ADDED
 }
 
 export interface PageLinesProps {
@@ -28,16 +30,21 @@ export interface PageLinesProps {
   verseRefs: React.MutableRefObject<Map<number, HTMLDivElement>>;
   hoveredVerse: number | null;
   setHoveredVerse: (verse: number | null) => void;
+  showTransliteration?: boolean;
+  transliterationFontSize?: string;
+  hoverTranslation: string | boolean;  // ✅ ADDED
 }
 
 export interface PageViewProps {
   surah: SurahMeta;
   assembledSurah: AssembledSurah;
   showArabicText: boolean;
-  hoverTranslation: boolean;
+  hoverTranslation: string | boolean;  // ✅ FIXED type
   fontClass: string;
   arabicFontSize: string;
   translationFontSize: string;
   verseRefs: React.MutableRefObject<Map<number, HTMLDivElement>>;
   wordSpacing?: string;
+  showTransliteration?: boolean;
+  transliterationFontSize?: string;
 }

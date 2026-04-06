@@ -1,7 +1,8 @@
+// In the Surah component, update the AyahView props to include hoverTransliteration and inlineTransliteration
 import { useParams, useSearchParams } from "react-router-dom";
 import { Layout } from "@/Top/Component/Layout/Index";
-import { SurahNavbar } from "@/Top/Component/Surah/Navbar";
-import { SurahNavigation } from "@/Top/Component/Surah/Navigation";
+import { SurahNavbar } from "@/Top/Component/Quran/Surah/Navbar";
+import { SurahNavigation } from "@/Top/Component/Quran/Surah/Navigation";
 import { AudioPlayer } from "@/Top/Component/Audio-Player/Index";
 import { SurahHeader } from "@/Top/Component/Quran/Surah/Header";
 import { PageView } from "@/Top/Component/Quran/Layout/Safhah/Index";
@@ -17,12 +18,12 @@ import { useReadingProgress } from "@/Middle/Hook/Use-Reading-Progress";
 import { useReadingSession } from "@/Middle/Hook/Use-Reading-Session";
 import { useQuranGoals } from "@/Middle/Hook/Use-Quran-Goals";
 import { Button } from "@/Top/Component/UI/button";
-import { Skeleton } from "@/Top/Component/UI/skeleton";
+import { Skeleton } from "@/Top/Component/UI/Skeleton";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { Alert, AlertDescription } from "@/Top/Component/UI/alert";
+import { Alert, AlertDescription } from "@/Top/Component/UI/Alert";
 
-const SurahIndex = () => {
+const Surah = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const surahId = parseInt(id || "1");
@@ -32,12 +33,20 @@ const SurahIndex = () => {
   const {
     layout, fontSize, translationFontSize, quranFont,
     showArabicText, verseTranslation, hoverTranslation, inlineTranslation,
+    // ✅ ADD transliteration settings
+    transliterationSize,
+    selectedAyahTransliterator,
+    hoverTransliteration,  // ✅ ADD
+    inlineTransliteration,  // ✅ ADD
   } = useApp();
 
+  // Determine if transliteration should be shown (not "None")
+  const showTransliteration = selectedAyahTransliterator !== "None";
+
   const { stop: stopAudio, isPlaying } = useAudio();
+  
   const { data: surahData, isLoading, error, refetch } = useQuranData(surahId);
   
-  // Safe access to verses and lines with null checks
   const verses = surahData?.verses;
   const lines = surahData?.lines;
 
@@ -51,7 +60,7 @@ const SurahIndex = () => {
   const [notesDialog, setNotesDialog] = useState<{ 
     open: boolean; 
     ayahId?: number; 
-    verse?: AssembledVerse; // Add verse object to state
+    verse?: AssembledVerse;
   }>({ open: false });
   const [shareDialog, setShareDialog] = useState<{ 
     open: boolean; 
@@ -85,6 +94,7 @@ const SurahIndex = () => {
 
   const arabicFontSize = `${(1.5 * fontSize) / 5}rem`;
   const translationFontSizeValue = `${(1 * translationFontSize) / 3}rem`;
+  const transliterationFontSizeValue = `${(1 * transliterationSize) / 3}rem`;
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current || !verses?.length) return;
@@ -250,6 +260,8 @@ const SurahIndex = () => {
               fontClass={getFontClass()}
               arabicFontSize={arabicFontSize}
               translationFontSize={translationFontSizeValue}
+              transliterationFontSize={transliterationFontSizeValue}
+              showTransliteration={showTransliteration}
               verseRefs={verseRefs}
             />
           ) : (
@@ -260,14 +272,18 @@ const SurahIndex = () => {
               verseTranslation={verseTranslation}
               inlineTranslation={inlineTranslation}
               translationFontSize={translationFontSizeValue}
+              transliterationFontSize={transliterationFontSizeValue}
+              selectedAyahTransliterator={selectedAyahTransliterator}
               targetVerse={targetVerse}
               verseRefs={verseRefs}
               onNotesClick={(ayahId, verseText) => {
-                // Find the verse object and pass it
                 const verse = verses.find(v => v.verseNumber === ayahId);
                 setNotesDialog({ open: true, ayahId, verse });
               }}
               onShareClick={(ayahId, verseText, translation) => setShareDialog({ open: true, ayahId, verseText, translation })}
+              // ✅ ADD these props
+              hoverTransliteration={hoverTransliteration}
+              inlineTransliteration={inlineTransliteration}
             />
           )}
 
@@ -316,4 +332,4 @@ const SurahIndex = () => {
   );
 };
 
-export default SurahIndex;
+export default Surah;

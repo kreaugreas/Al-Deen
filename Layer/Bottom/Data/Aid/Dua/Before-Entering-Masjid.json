@@ -1,15 +1,7 @@
-{
-  "id": "before-entering-masjid",
-  "name": "Before Entering Masjid",
-  "arabicName": "عند دخول المسجد",
-  "icon": "mosque",
-  "description": "Dua to recite before entering the masjid",
-  "duas": [
-    {
-      "id": 1,
-      "arabic": "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
-      "translation": "O Allah, open for me the gates of Your mercy.",
-      "reference": "Muslim"
-    }
+[
+  [
+    "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+    "O Allah, open for me the gates of Your mercy.",
+    "Muslim"
   ]
-}
+]

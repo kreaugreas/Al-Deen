@@ -7,7 +7,7 @@ import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { toast } from "@/Middle/Hook/Use-Toast";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/Top/Component/UI/dropdown-menu";
+} from "@/Top/Component/UI/Dropdown-Menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/Top/Component/UI/tooltip";
 import { useAudio } from "@/Middle/Context/Audio";
 import { useApp } from "@/Middle/Context/App";
@@ -23,10 +23,14 @@ export function VerseCard({
   showArabicText,
   verseTranslation,
   translationFontSize,
+  transliterationFontSize = "0.875rem",
+  showTransliteration = false,
   isHighlighted,
   verseRef,
   onNotesClick,
   onShareClick,
+  hoverTransliteration,
+  inlineTransliteration,
 }: VerseCardProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -36,6 +40,13 @@ export function VerseCard({
   const { playingKey, playWordAudio, isPlaying } = useAudioPlayback(surah.id);
 
   const [hoveredVerse, setHoveredVerse] = useState<number | null>(null);
+
+  // ✅ Combined tooltip enabled state - shows if EITHER translation OR transliteration is enabled
+  const isTooltipEnabled = useMemo(() => {
+    const hasTranslation = hoverTranslation !== "None" && hoverTranslation !== false;
+    const hasTransliteration = hoverTransliteration !== "None";
+    return hasTranslation || hasTransliteration;
+  }, [hoverTranslation, hoverTransliteration]);
 
   const computedFontClass = useMemo(() => {
     switch (quranFont) {
@@ -49,6 +60,15 @@ export function VerseCard({
 
   const arabicFontSize = useMemo(() => `${(1.5 * fontSize) / 5}rem`, [fontSize]);
 
+  // Helper to get transliteration text for the verse
+  const getTransliterationText = useMemo(() => {
+    if (!showTransliteration) return null;
+    if (verse.wbwTransliteration && verse.wbwTransliteration.length > 0) {
+      return verse.wbwTransliteration.join(" ");
+    }
+    return verse.transliteration || null;
+  }, [verse.wbwTransliteration, verse.transliteration, showTransliteration]);
+
   const handleBookmark = async () => {
     const bookmarked = isBookmarked(surah.id, verse.verseNumber);
     if (bookmarked) {
@@ -60,7 +80,11 @@ export function VerseCard({
   };
 
   const copyVerse = async () => {
-    const text = `${verse.arabic}\n\n${verse.translation}\n\n- ${surah.englishName} ${surah.id}:${verse.verseNumber}`;
+    let text = `${verse.arabic}\n\n`;
+    if (showTransliteration && getTransliterationText) {
+      text += `${getTransliterationText}\n\n`;
+    }
+    text += `${verse.translation}\n\n- ${surah.englishName} ${surah.id}:${verse.verseNumber}`;
     try {
       await navigator.clipboard.writeText(text);
       toast({ title: "Copied to clipboard" });
@@ -73,7 +97,7 @@ export function VerseCard({
     <Container 
       ref={verseRef} 
       className={cn(
-        "mb-6", // Add margin bottom for gap between cards
+        "mb-6",
         isHighlighted && "ring-2 ring-primary"
       )}
     >
@@ -142,8 +166,9 @@ export function VerseCard({
           </div>
         </div>
 
+        {/* Arabic Text */}
         {showArabicText && (
-          <div className="flex justify-end mb-6">
+          <div className="flex justify-end mb-4">
             <div
               className={computedFontClass}
               style={{ fontSize: arabicFontSize, lineHeight: 1.8 }}
@@ -154,7 +179,10 @@ export function VerseCard({
                 const belongsToVerse = verse.verseNumber;
                 const isVerseHighlighted = hoveredVerse !== null && belongsToVerse === hoveredVerse;
 
+                // Get translation and transliteration for this word
                 const translation = (!isVerseEnd && verse.wbwTranslation?.[idx]) || undefined;
+                const transliteration = (!isVerseEnd && verse.wbwTransliteration?.[idx]) || undefined;
+                
                 const wordKey = `word-${verse.verseNumber}-${idx}`;
                 const ayahKey = `ayah-${verse.verseNumber}`;
                 const isPlayingAudio = isPlaying(wordKey) || isPlaying(ayahKey);
@@ -203,7 +231,8 @@ export function VerseCard({
                   <WordTooltip
                     key={idx}
                     translation={translation}
-                    enabled={hoverTranslation}
+                    transliteration={transliteration}
+                    enabled={isTooltipEnabled}  // ✅ Use combined enabled state
                     onClick={handleClick}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
@@ -222,6 +251,19 @@ export function VerseCard({
           </div>
         )}
 
+        {/* Transliteration - shown between Arabic and Translation */}
+        {showTransliteration && getTransliterationText && (
+          <div className="mb-4">
+            <p 
+              className="text-muted-foreground leading-relaxed text-justify"
+              style={{ fontSize: transliterationFontSize }}
+            >
+              {getTransliterationText}
+            </p>
+          </div>
+        )}
+
+        {/* Translation */}
         {verseTranslation && verse.translation && (
           <div>
             <p 

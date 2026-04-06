@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Check, Search } from "lucide-react";
-import { Input } from "@/Top/Component/UI/input";
+import { Input } from "@/Top/Component/UI/Input";
+import { Button } from "@/Top/Component/UI/Button";
+import { Container } from "@/Top/Component/UI/Container";
 import { useApp } from "@/Middle/Context/App";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 import { cn } from "@/Middle/Library/utils";
@@ -27,32 +29,50 @@ export function LanguageSection({ onSelect }: LanguageSectionProps) {
 
   return (
     <div className="space-y-4">
+      {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={t.settings.searchLanguages}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 bg-muted/50 border-0"
+          className="pl-10 bg-muted/30 border-2 border-black dark:border-white rounded-[40px] focus:border-primary transition-colors"
         />
       </div>
-      <div className="space-y-1">
-        {filtered.map((lang) => (
-          <button
-            key={lang.code}
-            onClick={() => handleSelect(lang.code)}
-            className={cn(
-              "w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all",
-              currentLanguage === lang.code ? "bg-primary/10" : "hover:bg-muted/50"
-            )}
-          >
-            <div className="text-left">
-              <p className="font-medium text-sm text-foreground">{lang.name}</p>
-              <p className="text-xs text-muted-foreground">{lang.nativeName}</p>
-            </div>
-            {currentLanguage === lang.code && <Check className="h-4 w-4 text-primary" />}
-          </button>
-        ))}
+
+      {/* Language List */}
+      <div className="space-y-2">
+        {filtered.map((lang) => {
+          const isSelected = currentLanguage === lang.code;
+          return (
+            <Container
+              key={lang.code}
+              className={cn(
+                "!p-0 overflow-hidden transition-all hover:scale-[1.01] group",
+                isSelected && "border-primary/50 bg-primary/5"
+              )}
+            >
+              <Button
+                onClick={() => handleSelect(lang.code)}
+                className="w-full flex items-center justify-between px-4 py-3 h-auto"
+                variant="secondary"
+                fullWidth
+              >
+                <div className="text-left">
+                  <p className="font-medium text-sm text-foreground group-hover:text-white dark:group-hover:text-black">
+                    {lang.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground group-hover:text-white/70 dark:group-hover:text-black/70">
+                    {lang.nativeName}
+                  </p>
+                </div>
+                {isSelected && (
+                  <Check className="h-4 w-4 text-primary group-hover:text-white dark:group-hover:text-black" />
+                )}
+              </Button>
+            </Container>
+          );
+        })}
       </div>
     </div>
   );

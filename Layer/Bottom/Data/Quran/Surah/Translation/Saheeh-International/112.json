@@ -1,9 +1,6 @@
-{
-  "ID": 112,
-  "Ayah": [
-    { "Kalima": ["Say,", "He is Allah,", "who is One."] },
-    { "Kalima": ["Allah,", "the Eternal Refuge."] },
-    { "Kalima": ["He neither begets", "nor is born,"] },
-    { "Kalima": ["Nor is there", "to Him", "any equivalent."] }
-  ]
-}
+[
+  "Say, He is Allah, who is One.",
+  "Allah, the Eternal Refuge.",
+  "He neither begets nor is born,",
+  "Nor is there to Him any equivalent."
+]

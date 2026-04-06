@@ -6,11 +6,11 @@ import { getCollection, getChaptersByCollection } from "@/Bottom/API/Hadith";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
 
 const Hadith_Collection = () => {
-  const { collectionId } = useParams<{ collectionId: string }>();
+  const { Collection } = useParams<{ Collection: string }>();  // ✅ Changed from collectionId to Collection
   const { t } = useTranslation();
 
-  const collection = collectionId ? getCollection(collectionId) : null;
-  const chapters = collectionId ? getChaptersByCollection(collectionId) : [];
+  const collection = Collection ? getCollection(Collection) : null;
+  const chapters = Collection ? getChaptersByCollection(Collection) : [];
 
   if (!collection) {
     return (
@@ -40,7 +40,7 @@ const Hadith_Collection = () => {
           {chapters.map((chapter, index) => (
             <Link
               key={chapter.id}
-              to={`/Hadith/${collectionId}/${chapter.id}`}
+              to={`/Hadith/${collection.slug}/${chapter.id}`}
               className="flex-1 min-w-[150px]"
             >
               <Card className="p-4 text-center transition-all hover:scale-[1.01] group">

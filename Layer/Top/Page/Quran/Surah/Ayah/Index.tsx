@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { Layout } from "@/Top/Component/Layout/Index";
-import { SurahNavbar } from "@/Top/Component/Surah/Navbar";
-import { SurahNavigation } from "@/Top/Component/Surah/Navigation";
+import { SurahNavbar } from "@/Top/Component/Quran/Surah/Navbar";
+import { SurahNavigation } from "@/Top/Component/Quran/Surah/Navigation";
 import { AudioPlayer } from "@/Top/Component/Audio-Player/Index";
 import { SurahHeader } from "@/Top/Component/Quran/Surah/Header";
 import { VerseCard } from "@/Top/Component/Quran/Layout/Ayah/Main";
@@ -16,10 +16,10 @@ import { useQuranData } from "@/Middle/Hook/Use-Quran-Data";
 import { useReadingSession } from "@/Middle/Hook/Use-Reading-Session";
 import { useQuranGoals } from "@/Middle/Hook/Use-Quran-Goals";
 import { Button } from "@/Top/Component/UI/button";
-import { Skeleton } from "@/Top/Component/UI/skeleton";
+import { Skeleton } from "@/Top/Component/UI/Skeleton";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState, useRef, useMemo } from "react";
-import { Alert, AlertDescription } from "@/Top/Component/UI/alert";
+import { Alert, AlertDescription } from "@/Top/Component/UI/Alert";
 
 const AyahIndex = () => {
   const { id, verseId } = useParams<{ id: string; verseId: string }>();

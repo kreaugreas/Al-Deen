@@ -5,12 +5,12 @@ import { surahList, getSurah, getPageSegments } from "@/Bottom/API/Quran";
 import { PageLines } from "@/Top/Component/Quran/Layout/Safhah/Main";
 import { VerseCard } from "@/Top/Component/Quran/Layout/Ayah/Main";
 import { Layout } from "@/Top/Component/Layout/Index";
-import { SurahNavbar } from "@/Top/Component/Surah/Navbar";
+import { SurahNavbar } from "@/Top/Component/Quran/Surah/Navbar";
 import { useApp } from "@/Middle/Context/App";
 import { useAudio } from "@/Middle/Context/Audio";
-import { Skeleton } from "@/Top/Component/UI/skeleton";
+import { Skeleton } from "@/Top/Component/UI/Skeleton";
 import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/Top/Component/UI/alert";
+import { Alert, AlertDescription } from "@/Top/Component/UI/Alert";
 
 interface ResolvedWord {
   glyph: string;

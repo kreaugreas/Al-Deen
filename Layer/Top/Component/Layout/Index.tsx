@@ -2,8 +2,8 @@ import { ReactNode, lazy, Suspense } from "react";
 import { Header } from "@/Top/Component/Layout/Header";
 import { PageTransition } from "@/Top/Component/Page-Transition";
 
-const SettingsSidebar = lazy(() => import("@/Top/Component/Settings/Sidebar").then(m => ({ default: m.SettingsSidebar })));
-const SpotlightSearch = lazy(() => import("@/Top/Component/Search").then(m => ({ default: m.SpotlightSearch })));
+const SettingsSidebar = lazy(() => import("@/Top/Component/Settings/Index").then(module => ({ default: module.SettingsSidebar })));
+const SpotlightSearch = lazy(() => import("@/Top/Component/Search/Index").then(m => ({ default: m.SpotlightSearch })));
 
 interface LayoutProps {
   children: ReactNode;
