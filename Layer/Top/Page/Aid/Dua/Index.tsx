@@ -3,11 +3,8 @@ import { Layout } from "@/Top/Component/Layout/Index";
 import { duaCategories } from "@/Bottom/API/Aid";
 import { Button } from "@/Top/Component/UI/Button";
 
-// Helper function to convert name back to id for URL
 function getIdFromName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/\s+/g, "-");
+  return name.replace(/\s+/g, "-");
 }
 
 const Dua = () => {

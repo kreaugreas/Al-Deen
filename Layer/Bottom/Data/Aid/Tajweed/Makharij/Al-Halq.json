@@ -1,11 +1,9 @@
-{
-  "id": "al-halq",
-  "name": "Al-Halq",
-  "arabicName": "الحلق",
-  "description": "The Throat",
-  "rules": [
-    { "letter": "ه ء", "transliteration": "Hamzah & Ha", "description": "Deepest part of the throat (Aqsa al-Halq)", "example": "أَهْلًا", "exampleTranslation": "Welcome" },
-    { "letter": "ع ح", "transliteration": "Ayn & Haa", "description": "Middle of the throat (Wasat al-Halq)", "example": "عَحَدٌ", "exampleTranslation": "" },
-    { "letter": "غ خ", "transliteration": "Ghayn & Kha", "description": "Closest part of the throat to the mouth (Adna al-Halq)", "example": "غَفُورٌ خَبِيرٌ", "exampleTranslation": "Forgiving, All-Aware" }
+[
+  "الحلق",
+  "The Throat — 3 articulation points producing 6 letters",
+  [
+    ["ه ء", "Hamzah & Ha", "Deepest part of the throat (Aqsa al-Halq) — closest to the chest", "أَهْلًا", "Welcome"],
+    ["ع ح", "Ayn & Haa", "Middle of the throat (Wasat al-Halq)", "عَبَدَ", "He worshipped"],
+    ["غ خ", "Ghayn & Kha", "Closest part of the throat to the mouth (Adna al-Halq)", "غَفُورٌ خَبِيرٌ", "Forgiving, All-Aware"]
   ]
-}
+]

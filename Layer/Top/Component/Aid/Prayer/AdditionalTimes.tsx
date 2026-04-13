@@ -1,4 +1,5 @@
 import { formatTime } from "./Utility";
+import { Container } from "@/Top/Component/UI/Container";
 import type { PrayerTimesData, PrayerSettings } from "./Types";
 
 interface AdditionalTimesProps {
@@ -10,7 +11,7 @@ export function AdditionalTimes({ timings, settings }: AdditionalTimesProps) {
   if (!timings.Imsak && !timings.Midnight) return null;
 
   return (
-    <div className="glass-card p-4 !block">
+    <Container className="!p-4">
       <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Additional Times</p>
       <div className="grid grid-cols-2 gap-4">
         {timings.Imsak && (
@@ -26,6 +27,6 @@ export function AdditionalTimes({ timings, settings }: AdditionalTimesProps) {
           </div>
         )}
       </div>
-    </div>
+    </Container>
   );
 }

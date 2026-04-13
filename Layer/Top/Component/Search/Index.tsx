@@ -145,3 +145,4 @@ export function SpotlightSearch() {
     />
   );
 }
+export default SpotlightSearch;

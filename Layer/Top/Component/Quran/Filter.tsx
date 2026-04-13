@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { surahList } from "@/Bottom/API/Quran";
-import { Card } from "@/Top/Component/UI/Card";
+import { Container } from "@/Top/Component/UI/Container";
 import { Button } from "@/Top/Component/UI/Button";
 import { SlidingPill } from "@/Top/Component/UI/Sliding-Pill";
 import { cn } from "@/Middle/Library/utils";
@@ -63,9 +63,9 @@ export function Filter({
 
   return (
     <div className="absolute right-0 mt-2 w-80 z-50">
-      <Card className="p-4 space-y-3">
+      <Container className="!p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-black dark:text-white group-hover:text-white dark:group-hover:text-black">
+          <h3 className="text-sm font-semibold text-foreground">
             Filter
           </h3>
           {(filterType || selectedSurah) && (
@@ -145,7 +145,7 @@ export function Filter({
                 </Button>
                 {showSurahDropdown && (
                   <div className="absolute left-0 right-0 top-full mt-1 max-h-60 overflow-y-auto z-[100]">
-                    <Card className="p-1" hoverable={false}>
+                    <Container className="!p-1">
                       {surahList.map((surah) => (
                         <button
                           key={surah.id}
@@ -165,7 +165,7 @@ export function Filter({
                           {surah.id}. {surah.englishName}
                         </button>
                       ))}
-                    </Card>
+                    </Container>
                   </div>
                 )}
               </div>
@@ -186,7 +186,7 @@ export function Filter({
                 </Button>
                 {showAyahDropdown && (
                   <div className="absolute left-0 right-0 top-full mt-1 max-h-60 overflow-y-auto z-[100]">
-                    <Card className="p-1" hoverable={false}>
+                    <Container className="!p-1">
                       <button
                         onClick={() => {
                           setSelectedAyah(null);
@@ -220,16 +220,16 @@ export function Filter({
                           Ayah {ayah}
                         </button>
                       ))}
-                    </Card>
+                    </Container>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Order label - This will change color on card hover */}
+            {/* Order SlidingPill */}
             {(filterType === "surah" || filterType === "revelation") && (
               <div>
-                <p className="text-xs text-muted-foreground mb-2 group-hover:text-white dark:group-hover:text-black">
+                <p className="text-xs text-muted-foreground mb-2">
                   Order
                 </p>
                 <SlidingPill
@@ -246,11 +246,11 @@ export function Filter({
         <Button
           onClick={onApply}
           fullWidth
-          className="mt-2 bg-primary text-primary-foreground"
+          className="mt-2"
         >
           Apply
         </Button>
-      </Card>
+      </Container>
     </div>
   );
 }

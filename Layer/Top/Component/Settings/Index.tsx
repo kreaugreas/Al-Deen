@@ -1,4 +1,3 @@
-// Component/Settings/Index.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/Middle/Context/App";
@@ -10,9 +9,10 @@ import { Desktop } from "./Layout/Desktop";
 import { Mobile } from "./Layout/Mobile";
 import { AccountSection } from "./Content/Account/Index";
 import { QuranSection } from "./Content/Quran/Index";
-import { HadithSection } from "./Content/Hadith";  // ✅ Add this import
+import { HadithSection } from "./Content/Hadith";
+import { AidSection } from "./Content/Aid/Index";
 import { LanguageSection } from "./Content/Language";
-import type { SettingsCategory, AccountSubcategory } from "./Types";
+import type { SettingsCategory, AccountSubcategory, AidSubcategory } from "./Types";
 
 export function SettingsSidebar({ compact = false }: { compact?: boolean }) {
   const { isSettingsSidebarOpen, setSettingsSidebarOpen } = useApp();
@@ -21,7 +21,7 @@ export function SettingsSidebar({ compact = false }: { compact?: boolean }) {
   const isMobile = useIsMobile();
 
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>("account");
-  const [activeSubcategory, setActiveSubcategory] = useState<AccountSubcategory>("profile");
+  const [activeSubcategory, setActiveSubcategory] = useState<AccountSubcategory | AidSubcategory | null>("profile");
 
   const handleClose = () => {
     setSettingsSidebarOpen(false);
@@ -31,8 +31,8 @@ export function SettingsSidebar({ compact = false }: { compact?: boolean }) {
 
   const handleCategoryChange = (category: SettingsCategory) => {
     setActiveCategory(category);
-    if (category !== "account") {
-      setActiveSubcategory(null as any);
+    if (category !== "account" && category !== "aid") {
+      setActiveSubcategory(null);
     }
   };
 
@@ -66,14 +66,16 @@ export function SettingsSidebar({ compact = false }: { compact?: boolean }) {
             handleSignOut={handleSignOut}
             navigate={navigate}
             setSettingsSidebarOpen={setSettingsSidebarOpen}
-            activeSubcategory={activeSubcategory}
+            activeSubcategory={activeSubcategory as AccountSubcategory}
           />
         );
       }
       case "quran":
         return <QuranSection />;
-      case "hadith":  // ✅ Add this case
+      case "hadith":
         return <HadithSection />;
+      case "aid":
+        return <AidSection activeSubcategory={activeSubcategory as AidSubcategory} />;
       case "language":
         return <LanguageSection onSelect={() => {}} />;
       default:

@@ -15,10 +15,10 @@ export function SurahNavbar({ surahName, juz, hizb, page }: SurahNavbarProps) {
 
   return (
     <div
-      className="fixed left-0 right-0 z-40 w-full transition-all duration-300 flex justify-end"
+      className="fixed left-0 right-0 z-40 w-full transition-all duration-300 flex justify-center"
       style={{ top: headerVisible ? "80px" : "8px" }}
     >
-      <Container className="!py-2 !px-4 !w-auto mr-4">
+      <Container className="!py-2 !px-4 !w-auto">
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-foreground truncate">
             {surahName}
@@ -32,18 +32,18 @@ export function SurahNavbar({ surahName, juz, hizb, page }: SurahNavbarProps) {
               <span className="sm:hidden">
                 J<span className="font-semibold text-foreground/80">{juz}</span>
               </span>
-              
+
               <span className="text-muted-foreground/30">•</span>
-              
+
               <span className="hidden sm:inline">
                 Hizb <span className="font-semibold text-foreground/80">{hizb}</span>
               </span>
               <span className="sm:hidden">
                 H<span className="font-semibold text-foreground/80">{hizb}</span>
               </span>
-              
+
               <span className="text-muted-foreground/30">•</span>
-              
+
               <span className="hidden sm:inline">
                 Page <span className="font-semibold text-foreground/80">{page}</span>
               </span>

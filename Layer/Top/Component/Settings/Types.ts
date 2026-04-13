@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 
-export type SettingsCategory = "account" | "quran" | "hadith" | "language";
+export type SettingsCategory = "account" | "quran" | "hadith" | "aid" | "language";
 export type AccountSubcategory = "profile" | "bookmarks" | "notes" | "history";
+export type AidSubcategory = "prayer-times" | "dua";
 
 export interface SettingsCategoryConfig {
   id: SettingsCategory;
@@ -12,6 +13,12 @@ export interface SettingsCategoryConfig {
 
 export interface AccountSubcategoryConfig {
   id: AccountSubcategory;
+  label: string;
+  icon: ReactNode;
+}
+
+export interface AidSubcategoryConfig {
+  id: AidSubcategory;
   label: string;
   icon: ReactNode;
 }

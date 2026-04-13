@@ -3,7 +3,7 @@
 export interface Hadith {
   id: number;
   arabic: string;
-  transliteration: string;
+  transliteration: string | string[]; // can be array (word-by-word) or string
   translation: string;
   wbw?: string[];
   narrator: string;
@@ -36,7 +36,7 @@ export interface HadithCollection {
   description: string;
 }
 
-// Helper to format name from filename
+// Helper: format chapter name from folder name
 function formatNameFromId(id: string): string {
   return id
     .split("-")
@@ -44,12 +44,7 @@ function formatNameFromId(id: string): string {
     .join(" ");
 }
 
-// Helper to format slug from collection name
-function formatSlug(name: string): string {
-  return name.replace(/\s+/g, '-');
-}
-
-// Helper to extract range from hadith numbers
+// Helper: compute hadith range from list
 function getHadithRange(hadiths: Hadith[]): string {
   const numbers = hadiths.map(h => h.id);
   const min = Math.min(...numbers);
@@ -57,58 +52,73 @@ function getHadithRange(hadiths: Hadith[]): string {
   return `${min}-${max}`;
 }
 
-// Helper to parse array data into Hadith objects
-// New format: [arabic, transliteration, translation, wbw?, narrator, id]
-function parseHadithData(data: any[]): Hadith[] {
-  return data.map((item: any[], index: number) => {
-    // Check if the third element is an array (wbw) or string (translation)
-    // New format with transliteration at index 1
-    const hasWbw = Array.isArray(item[3]);
-    
-    if (hasWbw) {
-      // Format: [arabic, transliteration, translation, wbw[], narrator, id]
-      return {
-        id: item[5],
-        arabic: item[0],
-        transliteration: item[1],
-        translation: item[2],
-        wbw: item[3],
-        narrator: item[4],
-      };
-    } else {
-      // Format without WBW: [arabic, transliteration, translation, narrator, id]
-      return {
-        id: item[4],
-        arabic: item[0],
-        transliteration: item[1],
-        translation: item[2],
-        narrator: item[3],
-      };
-    }
-  });
+// Parse a single hadith JSON file (new format: no outer array, filename = id)
+function parseHadithFile(id: number, data: any[]): Hadith {
+  // data: [arabic, transliteration (string|array), translation, wbw? (array), narrator]
+  const transliteration = data[1];
+  const hasWbw = Array.isArray(data[3]);
+  if (hasWbw) {
+    return {
+      id,
+      arabic: data[0],
+      transliteration,
+      translation: data[2],
+      wbw: data[3],
+      narrator: data[4],
+    };
+  } else {
+    return {
+      id,
+      arabic: data[0],
+      transliteration,
+      translation: data[2],
+      narrator: data[3],
+    };
+  }
 }
 
-// Dynamically import all JSON files in the al-Bukhari folder
-const chapterModules = import.meta.glob('@/Bottom/Data/Hadith/Sahih/al-Bukhari/*.json', { eager: true });
+// Eagerly import all hadith JSON files from subfolders
+const allHadithFiles = import.meta.glob('@/Bottom/Data/Hadith/Sahih/al-Bukhari/*/*.json', { eager: true });
 
-// Build chapters dynamically from file imports
-const BUKHARI_CHAPTERS: Record<string, HadithChapter> = {};
+// Build chapter data: map chapterId -> { hadiths, name, range, count }
+const chaptersData: Record<string, { hadiths: Hadith[]; name: string; range: string; count: number }> = {};
 
-for (const [path, module] of Object.entries(chapterModules)) {
-  const fileName = path.split('/').pop()?.replace('.json', '') || '';
+// Group files by chapter folder
+for (const [path, module] of Object.entries(allHadithFiles)) {
+  const match = path.match(/\/al-Bukhari\/([^/]+)\/(\d+)\.json$/);
+  if (!match) continue;
+  const chapterId = match[1];
+  const hadithId = parseInt(match[2], 10);
   const data = (module as { default: any[] }).default;
-  const hadiths = parseHadithData(data);
-  
-  BUKHARI_CHAPTERS[fileName] = {
-    id: fileName,
-    name: formatNameFromId(fileName),
-    hadithRange: getHadithRange(hadiths),
-    hadithCount: hadiths.length,
-    hadiths,
+  const hadith = parseHadithFile(hadithId, data);
+
+  if (!chaptersData[chapterId]) {
+    chaptersData[chapterId] = { hadiths: [], name: formatNameFromId(chapterId), range: '', count: 0 };
+  }
+  chaptersData[chapterId].hadiths.push(hadith);
+}
+
+// After collecting all hadiths, sort each chapter's hadiths by id and compute range/count
+for (const chapterId in chaptersData) {
+  const chapter = chaptersData[chapterId];
+  chapter.hadiths.sort((a, b) => a.id - b.id);
+  chapter.range = getHadithRange(chapter.hadiths);
+  chapter.count = chapter.hadiths.length;
+}
+
+// Build BUKHARI_CHAPTERS in the expected format
+const BUKHARI_CHAPTERS: Record<string, HadithChapter> = {};
+for (const [id, data] of Object.entries(chaptersData)) {
+  BUKHARI_CHAPTERS[id] = {
+    id,
+    name: data.name,
+    hadithRange: data.range,
+    hadithCount: data.count,
+    hadiths: data.hadiths,
   };
 }
 
-// Collections with slug support
+// Collections (unchanged)
 export const hadithCollections: HadithCollection[] = [
   {
     id: "bukhari",
@@ -121,35 +131,32 @@ export const hadithCollections: HadithCollection[] = [
   },
 ];
 
-// Get collection by id OR slug
 export function getCollection(identifier: string): HadithCollection | null {
-  return hadithCollections.find(
-    (c) => c.id === identifier || c.slug === identifier
-  ) ?? null;
+  return hadithCollections.find(c => c.id === identifier || c.slug === identifier) ?? null;
 }
 
-// Get chapters by collection (by id or slug)
 export function getChaptersByCollection(identifier: string): HadithChapterMeta[] {
   const collection = getCollection(identifier);
   if (!collection || collection.id !== "bukhari") return [];
-  
   return Object.values(BUKHARI_CHAPTERS).map(({ id, name, hadithRange, hadithCount }) => ({
-    id,
-    name,
-    hadithRange,
-    hadithCount,
+    id, name, hadithRange, hadithCount,
   }));
 }
 
-// Get single chapter
 export function getChapter(collectionIdentifier: string, chapterId: string): HadithChapter | null {
   const collection = getCollection(collectionIdentifier);
   if (!collection || collection.id !== "bukhari") return null;
-  
   return BUKHARI_CHAPTERS[chapterId] ?? null;
 }
 
-// Get hadiths by chapter
 export function getHadithsByChapter(collectionIdentifier: string, chapterId: string): Hadith[] {
   return getChapter(collectionIdentifier, chapterId)?.hadiths ?? [];
+}
+
+// Helper: get full transliteration string (for components)
+export function getFullTransliteration(hadith: Hadith): string {
+  if (Array.isArray(hadith.transliteration)) {
+    return hadith.transliteration.join(" ");
+  }
+  return hadith.transliteration;
 }

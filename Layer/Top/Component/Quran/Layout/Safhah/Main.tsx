@@ -6,8 +6,6 @@ import { useAudio } from "@/Middle/Context/Audio";
 import { WordTooltip, useAudioPlayback, extractVerseNumberFromMarker } from "./Utility";
 import type { PageLinesProps } from "./Types";
 
-/** Inline text is always rendered in the system sans-serif stack,
- *  fully isolated from whatever Arabic font is active on the parent. */
 const LATIN_FONT_STYLE: React.CSSProperties = {
   fontFamily: "var(--font-sans, ui-sans-serif, system-ui, sans-serif)",
   fontFeatureSettings: "normal",
@@ -36,10 +34,7 @@ export const PageLines = memo(function PageLines({
 
   const isMobile = useMediaQuery("(max-width: 640px)");
 
-  // Derive inline sizes from the Arabic font size so they always
-  // feel proportional regardless of what the user sets.
-  // Clamped to a minimum so they never become unreadably tiny.
-  const arabicSize = parseFloat(arabicFontSize);
+  const arabicSize                = parseFloat(arabicFontSize);
   const inlineTranslationSize     = Math.max(12);
   const inlineTransliterationSize = Math.max(12);
 
@@ -50,6 +45,7 @@ export const PageLines = memo(function PageLines({
 
   const showInlineTranslation     = inlineTranslation !== "None";
   const showInlineTransliteration = inlineTransliteration !== "None";
+  const anyInlineActive           = showInlineTranslation || showInlineTransliteration;
 
   const allWords = useMemo(
     () => resolvedLines.flatMap((line) => line),
@@ -158,17 +154,18 @@ export const PageLines = memo(function PageLines({
       }
     };
 
-    const showTranslationCol     = showInlineTranslation && translation;
-    const showTransliterationCol = showInlineTransliteration && transliteration;
+    const showTranslationCol     = showInlineTranslation && !!translation;
+    const showTransliterationCol = showInlineTransliteration && !!transliteration;
     const hasInline              = showTranslationCol || showTransliterationCol;
 
     return (
       <div
         key={idx}
         className="flex flex-col items-center"
-        style={{ minWidth: "2rem" }}
+        // No minWidth when inline is off — let wordSpacing do its job naturally
+        style={anyInlineActive ? { minWidth: "2rem" } : undefined}
       >
-        {/* ── Arabic glyph (inherits Arabic font from parent) ── */}
+        {/* ── Arabic glyph ── */}
         <WordTooltip
           translation={translation}
           transliteration={transliteration}
@@ -187,10 +184,7 @@ export const PageLines = memo(function PageLines({
           </span>
         </WordTooltip>
 
-        {/* ── Inline translation / transliteration ──
-            Font is fully reset so Arabic ligature/substitution
-            features cannot corrupt Latin characters.
-            Sizes are derived from arabicFontSize automatically. */}
+        {/* No div rendered at all when hasInline is false — zero space, zero margin */}
         {hasInline && (
           <div
             className="flex flex-col items-center gap-y-0.5 mt-1 w-full"
@@ -227,22 +221,14 @@ export const PageLines = memo(function PageLines({
         dir="rtl"
       >
         {isMobile ? (
-          /* ── Mobile ─────────────────────────────────────────────
-             Each word-column wraps as an atomic unit. justify-end
-             keeps the flow RTL-natural. gap-y-4 gives breathing
-             room between wrapped rows when inline text is present. */
-          <div className="flex flex-wrap justify-end items-start gap-x-2 gap-y-4">
+          <div className={`flex flex-wrap justify-end items-start ${anyInlineActive ? "gap-x-2 gap-y-4" : "gap-x-0 gap-y-0"}`}>
             {allWords.map((word, idx) => renderWordColumn(word, idx, false))}
           </div>
         ) : (
-          /* ── Desktop ─────────────────────────────────────────────
-             One RTL flex row per Mushaf line. items-start keeps
-             columns top-aligned regardless of whether inline text
-             is present on a given word.                           */
           resolvedLines.map((line, lineIdx) => (
             <div
               key={lineIdx}
-              className="flex justify-center items-start gap-x-3 flex-wrap mb-6"
+              className={`flex justify-center items-start flex-wrap ${anyInlineActive ? "gap-x-3 mb-6" : "gap-x-0 mb-0"}`}
               dir="rtl"
             >
               {line.map((word, wordIdx) =>

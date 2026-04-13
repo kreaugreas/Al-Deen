@@ -46,6 +46,15 @@ const Aid = () => {
           </Link>
         </div>
         <div className="flex-1 min-w-[120px]">
+          <Link to="/Aid/Tasbih">
+            <Card className="p-4 text-center hover:scale-[1.02] group">
+              <span className="font-semibold text-base group-hover:text-white dark:group-hover:text-black">
+                Tasbih
+              </span>
+            </Card>
+          </Link>
+        </div>
+        <div className="flex-1 min-w-[120px]">
           <Link to="/Aid/Dua">
             <Card className="p-4 text-center hover:scale-[1.02] group">
               <span className="font-semibold text-base group-hover:text-white dark:group-hover:text-black">
@@ -63,7 +72,7 @@ const Aid = () => {
             </Card>
           </Link>
         </div>
-                <div className="flex-1 min-w-[120px]">
+        <div className="flex-1 min-w-[120px]">
           <Link to="/Aid/Tajweed">
             <Card className="p-4 text-center hover:scale-[1.02] group">
               <span className="font-semibold text-base group-hover:text-white dark:group-hover:text-black">

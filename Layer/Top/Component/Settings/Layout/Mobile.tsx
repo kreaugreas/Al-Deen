@@ -1,17 +1,18 @@
-// Component/Settings/Layout/Mobile.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollArea } from "@/Top/Component/UI/Scroll-Area";
 import { Button } from "@/Top/Component/UI/Button";
 import { Container } from "@/Top/Component/UI/Container";
-import { ChevronRight, ArrowLeft, X } from "lucide-react";
-import { SETTINGS_CATEGORIES, ACCOUNT_SUBCATEGORIES } from "../Constants";
-import type { SettingsCategory, AccountSubcategory } from "../Types";
+import { ChevronRight } from "lucide-react";
+import { SETTINGS_CATEGORIES, getSubcategories } from "../Constants";
+import type { SettingsCategory, AccountSubcategory, AidSubcategory } from "../Types";
+
+type SubcategoryId = AccountSubcategory | AidSubcategory;
 
 interface MobileProps {
   activeCategory: SettingsCategory;
-  activeSubcategory: AccountSubcategory | null;
+  activeSubcategory: SubcategoryId | null;
   onCategoryChange: (category: SettingsCategory) => void;
-  onSubcategoryChange: (subcategory: AccountSubcategory) => void;
+  onSubcategoryChange: (subcategory: SubcategoryId) => void;
   onClose: () => void;
   children: React.ReactNode;
 }
@@ -24,107 +25,110 @@ export function Mobile({
   onClose, 
   children 
 }: MobileProps) {
-  const [showCategories, setShowCategories] = useState(true);
-  const [showSubcategories, setShowSubcategories] = useState(false);
+  const [view, setView] = useState<"categories" | "subcategories" | "content">("categories");
+  const [selectedCategory, setSelectedCategory] = useState<SettingsCategory | null>(null);
 
-  // If showing categories menu
-  if (showCategories) {
+  // Notify parent of header changes (handled by parent)
+  useEffect(() => {
+    // This effect can be used to sync with parent if needed
+  }, [view, selectedCategory, activeCategory, activeSubcategory]);
+
+  const handleCategorySelect = (category: SettingsCategory) => {
+    const catConfig = SETTINGS_CATEGORIES.find(c => c.id === category);
+    if (catConfig?.hasSubcategories) {
+      setSelectedCategory(category);
+      setView("subcategories");
+    } else {
+      onCategoryChange(category);
+      onSubcategoryChange(null as any);
+      setView("content");
+    }
+  };
+
+  const handleSubcategorySelect = (subcategory: SubcategoryId) => {
+    if (selectedCategory) {
+      onCategoryChange(selectedCategory);
+      onSubcategoryChange(subcategory);
+      setView("content");
+    }
+  };
+
+  const handleBack = () => {
+    if (view === "content") {
+      const catConfig = SETTINGS_CATEGORIES.find(c => c.id === activeCategory);
+      if (catConfig?.hasSubcategories) {
+        setView("subcategories");
+      } else {
+        setView("categories");
+        setSelectedCategory(null);
+      }
+    } else if (view === "subcategories") {
+      setView("categories");
+      setSelectedCategory(null);
+    } else if (view === "categories") {
+      onClose();
+    }
+  };
+
+  // Categories view
+  if (view === "categories") {
     return (
-      <div className="fixed inset-0 z-40 bg-background pt-[60px]">
+      <div className="fixed inset-0 z-40 bg-background">
         <ScrollArea className="h-full">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-6">
-              <Container className="!w-auto !py-1 !px-3">
-                <h2 className="text-sm font-semibold text-foreground">Settings</h2>
-              </Container>
-              <Button onClick={onClose} size="sm" className="w-8 h-8 p-0 rounded-full">
-                <X className="h-4 w-4" />
-              </Button>
+          <div className="pt-[60px]">
+            <div className="p-4">
+              <div className="space-y-2">
+                {SETTINGS_CATEGORIES.map((cat) => {
+                  const Icon = cat.icon;
+                  return (
+                    <Container key={cat.id} className="!p-0 overflow-hidden group">
+                      <Button
+                        onClick={() => handleCategorySelect(cat.id)}
+                        className="w-full flex items-center justify-between gap-3 h-auto py-4 px-4"
+                        fullWidth
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon className="h-5 w-5" />
+                          <span className="text-sm font-medium">{cat.label}</span>
+                        </div>
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </Container>
+                  );
+                })}
+              </div>
             </div>
-            
-            <div className="space-y-2">
-              {SETTINGS_CATEGORIES.map((cat) => {
-                const Icon = cat.icon;
-                const isAccount = cat.id === "account";
-                return (
-                  <Container key={cat.id} className="!p-0 overflow-hidden group">
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
+  // Subcategories view
+  if (view === "subcategories" && selectedCategory) {
+    const subcategories = getSubcategories(selectedCategory);
+    return (
+      <div className="fixed inset-0 z-40 bg-background">
+        <ScrollArea className="h-full">
+          <div className="pt-[60px]">
+            <div className="p-4">
+              <div className="space-y-2">
+                {subcategories.map((sub) => (
+                  <Container key={sub.id} className="!p-0 overflow-hidden group">
                     <Button
-                      onClick={() => {
-                        if (isAccount) {
-                          setShowCategories(false);
-                          setShowSubcategories(true);
-                        } else {
-                          onCategoryChange(cat.id);
-                          setShowCategories(false);
-                        }
-                      }}
+                      onClick={() => handleSubcategorySelect(sub.id as any)}
                       className="w-full flex items-center justify-between gap-3 h-auto py-4 px-4"
                       fullWidth
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className="h-5 w-5" />
-                        <span className="text-sm font-medium">{cat.label}</span>
+                        {sub.icon}
+                        <span className="text-sm font-medium">{sub.label}</span>
                       </div>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </Container>
-                );
-              })}
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-    );
-  }
-
-  // If showing account subcategories
-  if (showSubcategories) {
-    return (
-      <div className="fixed inset-0 z-40 bg-background pt-[60px]">
-        <ScrollArea className="h-full">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-1">
-                <Button
-                  onClick={() => {
-                    setShowCategories(true);
-                    setShowSubcategories(false);
-                  }}
-                  size="sm"
-                  className="w-8 h-8 p-0 rounded-full"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <Container className="!w-auto !py-1 !px-3">
-                  <h2 className="text-sm font-semibold text-foreground">Account</h2>
-                </Container>
+                ))}
               </div>
-              <Button onClick={onClose} size="sm" className="w-8 h-8 p-0 rounded-full">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="space-y-2">
-              {ACCOUNT_SUBCATEGORIES.map((sub) => (
-                <Container key={sub.id} className="!p-0 overflow-hidden group">
-                  <Button
-                    onClick={() => {
-                      onCategoryChange("account");
-                      onSubcategoryChange(sub.id);
-                      setShowCategories(false);
-                      setShowSubcategories(false);
-                    }}
-                    className="w-full flex items-center justify-between gap-3 h-auto py-4 px-4"
-                    fullWidth
-                  >
-                    <div className="flex items-center gap-3">
-                      {sub.icon}
-                      <span className="text-sm font-medium">{sub.label}</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </Container>
-              ))}
             </div>
           </div>
         </ScrollArea>
@@ -132,36 +136,14 @@ export function Mobile({
     );
   }
 
-  // Showing content
+  // Content view
   return (
-    <div className="fixed inset-0 z-40 bg-background pt-[60px]">
+    <div className="fixed inset-0 z-40 bg-background">
       <ScrollArea className="h-full">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => {
-                  setShowCategories(true);
-                  setShowSubcategories(false);
-                }}
-                size="sm"
-                className="w-8 h-8 p-0 rounded-full"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <Container className="!w-auto !py-1 !px-3">
-                <h2 className="text-sm font-semibold text-foreground">
-                  {activeCategory === "account" 
-                    ? ACCOUNT_SUBCATEGORIES.find(s => s.id === activeSubcategory)?.label 
-                    : SETTINGS_CATEGORIES.find(c => c.id === activeCategory)?.label}
-                </h2>
-              </Container>
-            </div>
-            <Button onClick={onClose} size="sm" className="w-8 h-8 p-0 rounded-full">
-              <X className="h-4 w-4" />
-            </Button>
+        <div className="pt-[60px]">
+          <div className="p-4">
+            {children}
           </div>
-          {children}
         </div>
       </ScrollArea>
     </div>

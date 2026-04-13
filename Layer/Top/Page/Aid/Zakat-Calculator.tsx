@@ -1,383 +1,331 @@
 import { useState } from "react";
 import { Layout } from "@/Top/Component/Layout/Index";
+import { Calculator, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { Button } from "@/Top/Component/UI/Button";
 import { Container } from "@/Top/Component/UI/Container";
 
 const NISAB_GOLD_GRAMS = 87.48;
 const NISAB_SILVER_GRAMS = 612.36;
 const ZAKAT_RATE = 0.025;
 
-const CURRENCIES = [
-  { code: "USD", symbol: "$" },
-  { code: "EUR", symbol: "€" },
-  { code: "GBP", symbol: "£" },
-  { code: "SAR", symbol: "﷼" },
-  { code: "AED", symbol: "د.إ" },
-  { code: "MYR", symbol: "RM" },
-  { code: "PKR", symbol: "₨" },
-  { code: "BDT", symbol: "৳" },
-  { code: "IDR", symbol: "Rp" },
-  { code: "TRY", symbol: "₺" },
-];
+type WizardStep = 1 | 2 | 3 | 4 | 5;
 
 const ZakatCalculatorPage = () => {
-  const [currency, setCurrency] = useState(CURRENCIES[0]);
-
-  // Nisab prices
-  const [goldPricePerGram, setGoldPricePerGram] = useState(70);
-  const [silverPricePerGram, setSilverPricePerGram] = useState(0.85);
-
-  // Cash & savings
+  const [step, setStep] = useState<WizardStep>(1);
+  
+  // Nisab settings
+  const [goldPrice, setGoldPrice] = useState(70);
+  const [silverPrice, setSilverPrice] = useState(0.85);
+  
+  // Wealth inputs
   const [cash, setCash] = useState(0);
-  const [bankSavings, setBankSavings] = useState(0);
-
-  // Gold & silver — entered in grams; value derived from price
-  const [goldGrams, setGoldGrams] = useState(0);
-  const [silverGrams, setSilverGrams] = useState(0);
-
-  // Investments
-  const [stocks, setStocks] = useState(0);
-  const [cryptoValue, setCryptoValue] = useState(0);
-
-  // Business
-  const [businessInventory, setBusinessInventory] = useState(0);
-  const [receivables, setReceivables] = useState(0); // money owed to you
-
-  // Property
-  const [rentalIncome, setRentalIncome] = useState(0); // annual rental income only
-
-  // Retirement (accessible portion)
-  const [retirementAccessible, setRetirementAccessible] = useState(0);
-
-  // Liabilities
+  const [savings, setSavings] = useState(0);
+  const [goldValue, setGoldValue] = useState(0);
+  const [silverValue, setSilverValue] = useState(0);
+  const [investments, setInvestments] = useState(0);
   const [debts, setDebts] = useState(0);
-  const [immediateExpenses, setImmediateExpenses] = useState(0); // rent due, bills, etc.
 
-  // Derived
-  const goldValue = goldGrams * goldPricePerGram;
-  const silverValue = silverGrams * silverPricePerGram;
-
-  const nisabGold = NISAB_GOLD_GRAMS * goldPricePerGram;
-  const nisabSilver = NISAB_SILVER_GRAMS * silverPricePerGram;
+  const totalWealth = cash + savings + investments + goldValue + silverValue;
+  const netWealth = Math.max(0, totalWealth - debts);
+  const nisabGold = NISAB_GOLD_GRAMS * goldPrice;
+  const nisabSilver = NISAB_SILVER_GRAMS * silverPrice;
   const nisab = Math.min(nisabGold, nisabSilver);
-
-  const totalAssets =
-    cash +
-    bankSavings +
-    goldValue +
-    silverValue +
-    stocks +
-    cryptoValue +
-    businessInventory +
-    receivables +
-    rentalIncome +
-    retirementAccessible;
-
-  const totalLiabilities = debts + immediateExpenses;
-  const netWealth = Math.max(0, totalAssets - totalLiabilities);
   const zakatDue = netWealth >= nisab ? netWealth * ZAKAT_RATE : 0;
 
-  const fmt = (val: number) =>
-    `${currency.symbol}${val.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const goNext = () => {
+    if (step < 5) setStep((step + 1) as WizardStep);
+  };
+
+  const goPrev = () => {
+    if (step > 1) setStep((step - 1) as WizardStep);
+  };
+
+  const resetCalculator = () => {
+    setStep(1);
+    setGoldPrice(70);
+    setSilverPrice(0.85);
+    setCash(0);
+    setSavings(0);
+    setGoldValue(0);
+    setSilverValue(0);
+    setInvestments(0);
+    setDebts(0);
+  };
+
+  const StepIndicator = () => (
+    <div className="flex items-center justify-center mb-8">
+      {[1, 2, 3, 4, 5].map((s, idx) => (
+        <div key={s} className="flex items-center">
+          {/* Step Circle */}
+          <div
+            className={`
+              w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300
+              ${step === s 
+                ? "bg-black dark:bg-white text-white dark:text-black ring-2 ring-black/20 dark:ring-white/20" 
+                : step > s 
+                  ? "bg-[rgb(128,128,128)] text-white" 
+                  : "bg-white dark:bg-black border-2 border-black dark:border-white text-black dark:text-white"
+              }
+            `}
+          >
+            {step > s ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              s
+            )}
+          </div>
+          
+          {/* Connecting Line (except after last step) */}
+          {idx < 4 && (
+            <div className="w-12 mx-1 relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className={`h-0.5 w-full transition-all duration-500 ease-in-out ${
+                  step > s ? "bg-[rgb(128,128,128)]" : "bg-muted"
+                }`} />
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-2">
+              <h2 className="text-lg font-semibold mb-1">Nisab Threshold</h2>
+              <p className="text-xs text-muted-foreground">
+                Set current gold and silver prices per gram
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Gold price/g ($)</label>
+                <input
+                  type="number"
+                  value={goldPrice}
+                  onChange={(e) => setGoldPrice(Number(e.target.value))}
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Silver price/g ($)</label>
+                <input
+                  type="number"
+                  value={silverPrice}
+                  onChange={(e) => setSilverPrice(Number(e.target.value))}
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="p-3 rounded-[40px] bg-muted/30 mt-2">
+                <p className="text-xs text-muted-foreground text-center">
+                  Nisab threshold: <span className="font-semibold text-foreground">${nisab.toFixed(2)}</span>
+                  <br />
+                  (based on lower of gold/silver)
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-2">
+              <h2 className="text-lg font-semibold mb-1">Cash & Savings</h2>
+              <p className="text-xs text-muted-foreground">
+                Enter the cash you have on hand and in bank accounts
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Cash in Hand ($)</label>
+                <input
+                  type="number"
+                  value={cash || ""}
+                  onChange={(e) => setCash(Number(e.target.value) || 0)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Bank Savings ($)</label>
+                <input
+                  type="number"
+                  value={savings || ""}
+                  onChange={(e) => setSavings(Number(e.target.value) || 0)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-2">
+              <h2 className="text-lg font-semibold mb-1">Gold & Silver Value</h2>
+              <p className="text-xs text-muted-foreground">
+                Enter the value of your gold and silver
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Gold Value ($)</label>
+                <input
+                  type="number"
+                  value={goldValue || ""}
+                  onChange={(e) => setGoldValue(Number(e.target.value) || 0)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Silver Value ($)</label>
+                <input
+                  type="number"
+                  value={silverValue || ""}
+                  onChange={(e) => setSilverValue(Number(e.target.value) || 0)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-2">
+              <h2 className="text-lg font-semibold mb-1">Investments & Debts</h2>
+              <p className="text-xs text-muted-foreground">
+                Enter your investments and any debts you owe
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Investments & Stocks ($)</label>
+                <input
+                  type="number"
+                  value={investments || ""}
+                  onChange={(e) => setInvestments(Number(e.target.value) || 0)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Debts Owed ($)</label>
+                <input
+                  type="number"
+                  value={debts || ""}
+                  onChange={(e) => setDebts(Number(e.target.value) || 0)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="space-y-4">
+            <div className="text-center">
+              <h2 className="text-lg font-semibold mb-2">Your Zakat Summary</h2>
+              <p className="text-xs text-muted-foreground">
+                Based on the information you provided
+              </p>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="p-4 rounded-[40px] bg-muted/30">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm">Total Wealth</span>
+                  <span className="font-semibold">${totalWealth.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm">Debts</span>
+                  <span className="font-semibold text-destructive">-${debts.toFixed(2)}</span>
+                </div>
+                <div className="border-t border-border my-2" />
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium">Net Wealth</span>
+                  <span className="font-bold text-lg">${netWealth.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className={`p-4 rounded-[40px] ${zakatDue > 0 ? "bg-primary/5 border border-primary/30" : "bg-muted/30"}`}>
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Nisab Threshold</p>
+                  <p className="text-sm font-mono mb-3">${nisab.toFixed(2)}</p>
+
+                  {netWealth >= nisab ? (
+                    <>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Zakat Due (2.5%)</p>
+                      <p className="text-3xl font-bold text-primary">${zakatDue.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        May Allah accept your charity.
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Your wealth is below the Nisab threshold. No Zakat is due.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Button onClick={resetCalculator} variant="secondary" fullWidth>
+              Calculate Again
+            </Button>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <Layout>
-      <section className="py-6">
-        <div className="container max-w-lg mx-auto space-y-4">
+      <div className="container max-w-md mx-auto py-6 px-4">
+        {/* Title in Container */}
+        <Container className="!py-3 !px-4 mb-6 flex items-center gap-2 justify-center">
+          <Calculator className="h-5 w-5 text-foreground" />
+          <h1 className="text-lg font-bold">Zakat Calculator</h1>
+        </Container>
 
-          {/* Currency selector */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Currency</p>
-            <div className="flex flex-wrap gap-2">
-              {CURRENCIES.map((c) => (
-                <button
-                  key={c.code}
-                  onClick={() => setCurrency(c)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border-2 transition-colors ${
-                    currency.code === c.code
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-black dark:border-white text-muted-foreground"
-                  }`}
-                >
-                  {c.code}
-                </button>
-              ))}
-            </div>
-          </Container>
+        <Container className="!p-5">
+          <StepIndicator />
+          
+          {renderStep()}
 
-          {/* Nisab thresholds */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Nisab Threshold Prices</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">
-                  Gold price / gram ({currency.symbol})
-                </label>
-                <input
-                  type="number"
-                  value={goldPricePerGram}
-                  onChange={(e) => setGoldPricePerGram(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">
-                  Silver price / gram ({currency.symbol})
-                </label>
-                <input
-                  type="number"
-                  value={silverPricePerGram}
-                  onChange={(e) => setSilverPricePerGram(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                />
-              </div>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-1 text-xs text-muted-foreground">
-              <p>Gold nisab (87.48g): {fmt(nisabGold)}</p>
-              <p>Silver nisab (612.36g): {fmt(nisabSilver)}</p>
-              <p className="col-span-2 font-medium text-foreground mt-1">
-                Applicable nisab (lower): {fmt(nisab)}
-              </p>
-            </div>
-          </Container>
-
-          {/* Cash & Savings */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Cash & Savings</p>
-            <div className="space-y-3">
-              {[
-                { label: "Cash in Hand", value: cash, setter: setCash },
-                { label: "Bank Savings / Current Account", value: bankSavings, setter: setBankSavings },
-              ].map((f) => (
-                <div key={f.label}>
-                  <label className="text-sm font-medium block mb-1">{f.label}</label>
-                  <input
-                    type="number"
-                    value={f.value || ""}
-                    onChange={(e) => f.setter(Number(e.target.value) || 0)}
-                    placeholder="0.00"
-                    className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              ))}
-            </div>
-          </Container>
-
-          {/* Gold & Silver */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Gold & Silver</p>
-            <p className="text-xs text-muted-foreground mb-3">
-              Enter weight in grams. Value is auto-calculated using prices above.
-              <br />
-              <span className="text-foreground/60">Note: Gold/silver used for daily personal wear is exempt by many scholars.</span>
-            </p>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <label className="text-sm font-medium block mb-1">Gold (grams)</label>
-                <input
-                  type="number"
-                  value={goldGrams || ""}
-                  onChange={(e) => setGoldGrams(Number(e.target.value) || 0)}
-                  placeholder="0"
-                  className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                />
-                <p className="text-xs text-muted-foreground mt-1 pl-1">= {fmt(goldValue)}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-1">Silver (grams)</label>
-                <input
-                  type="number"
-                  value={silverGrams || ""}
-                  onChange={(e) => setSilverGrams(Number(e.target.value) || 0)}
-                  placeholder="0"
-                  className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                />
-                <p className="text-xs text-muted-foreground mt-1 pl-1">= {fmt(silverValue)}</p>
-              </div>
-            </div>
-          </Container>
-
-          {/* Investments */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Investments</p>
-            <div className="space-y-3">
-              {[
-                {
-                  label: "Stocks & Shares",
-                  sub: "Market value of zakatable portion (exclude fixed assets of company)",
-                  value: stocks,
-                  setter: setStocks,
-                },
-                {
-                  label: "Cryptocurrency",
-                  sub: "Current market value",
-                  value: cryptoValue,
-                  setter: setCryptoValue,
-                },
-                {
-                  label: "Accessible Retirement / Pension",
-                  sub: "Only the portion you can currently withdraw",
-                  value: retirementAccessible,
-                  setter: setRetirementAccessible,
-                },
-              ].map((f) => (
-                <div key={f.label}>
-                  <label className="text-sm font-medium block mb-0.5">{f.label}</label>
-                  {f.sub && <p className="text-xs text-muted-foreground mb-1">{f.sub}</p>}
-                  <input
-                    type="number"
-                    value={f.value || ""}
-                    onChange={(e) => f.setter(Number(e.target.value) || 0)}
-                    placeholder="0.00"
-                    className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              ))}
-            </div>
-          </Container>
-
-          {/* Business */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Business Assets</p>
-            <div className="space-y-3">
-              {[
-                {
-                  label: "Business Inventory",
-                  sub: "Value of stock/goods held for sale (not equipment or fixed assets)",
-                  value: businessInventory,
-                  setter: setBusinessInventory,
-                },
-                {
-                  label: "Receivables (Money Owed to You)",
-                  sub: "Amounts you expect to receive — e.g. unpaid invoices, loans given out",
-                  value: receivables,
-                  setter: setReceivables,
-                },
-                {
-                  label: "Annual Rental Income",
-                  sub: "Zakat applies to rental income, not the property value itself",
-                  value: rentalIncome,
-                  setter: setRentalIncome,
-                },
-              ].map((f) => (
-                <div key={f.label}>
-                  <label className="text-sm font-medium block mb-0.5">{f.label}</label>
-                  {f.sub && <p className="text-xs text-muted-foreground mb-1">{f.sub}</p>}
-                  <input
-                    type="number"
-                    value={f.value || ""}
-                    onChange={(e) => f.setter(Number(e.target.value) || 0)}
-                    placeholder="0.00"
-                    className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              ))}
-            </div>
-          </Container>
-
-          {/* Liabilities */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Liabilities (Deductions)</p>
-            <div className="space-y-3">
-              {[
-                {
-                  label: "Debts Owed by You",
-                  sub: "Loans, mortgages, credit card balances you owe",
-                  value: debts,
-                  setter: setDebts,
-                },
-                {
-                  label: "Immediate Expenses Due",
-                  sub: "Rent, bills, or payments due within the month",
-                  value: immediateExpenses,
-                  setter: setImmediateExpenses,
-                },
-              ].map((f) => (
-                <div key={f.label}>
-                  <label className="text-sm font-medium block mb-0.5">{f.label}</label>
-                  {f.sub && <p className="text-xs text-muted-foreground mb-1">{f.sub}</p>}
-                  <input
-                    type="number"
-                    value={f.value || ""}
-                    onChange={(e) => f.setter(Number(e.target.value) || 0)}
-                    placeholder="0.00"
-                    className="w-full px-3 py-2 rounded-[40px] bg-muted/30 border-2 border-black dark:border-white text-sm outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              ))}
-            </div>
-          </Container>
-
-          {/* Summary */}
-          <Container className="!p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Wealth Summary</p>
-            <div className="space-y-1.5 text-sm">
-              {[
-                { label: "Cash & Savings", value: cash + bankSavings },
-                { label: "Gold & Silver", value: goldValue + silverValue },
-                { label: "Investments & Crypto", value: stocks + cryptoValue + retirementAccessible },
-                { label: "Business Assets", value: businessInventory + receivables + rentalIncome },
-                { label: "Total Assets", value: totalAssets, bold: true },
-                { label: "Total Liabilities", value: -totalLiabilities, negative: true },
-                { label: "Net Zakatable Wealth", value: netWealth, bold: true },
-              ].map((row) => (
-                <div key={row.label} className={`flex justify-between ${row.bold ? "font-semibold border-t border-border pt-1.5 mt-1.5" : ""}`}>
-                  <span className={row.negative ? "text-destructive" : ""}>{row.label}</span>
-                  <span className={row.negative ? "text-destructive" : ""}>{fmt(Math.abs(row.value))}</span>
-                </div>
-              ))}
-            </div>
-          </Container>
-
-          {/* Result */}
-          <Container className={`!p-5 ${zakatDue > 0 ? "border-primary/50 bg-primary/5" : ""}`}>
-            <div className="text-center">
-              {netWealth >= nisab ? (
-                <>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Zakat Due (2.5%)</p>
-                  <p className="text-4xl font-bold text-primary mb-2">{fmt(zakatDue)}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Your net wealth of {fmt(netWealth)} exceeds the nisab of {fmt(nisab)}.
-                  </p>
-                </>
+          {/* Navigation Buttons */}
+          {step < 5 && (
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+              {step > 1 ? (
+                <Button onClick={goPrev} variant="secondary" className="gap-2">
+                  <ChevronLeft className="h-4 w-4" />
+                  Back
+                </Button>
               ) : (
-                <>
-                  <p className="text-xl font-semibold mb-2">No Zakat Due</p>
-                  <p className="text-sm text-muted-foreground">
-                    Your net wealth of {fmt(netWealth)} is below the nisab threshold of {fmt(nisab)}.
-                  </p>
-                </>
+                <div />
               )}
+              <Button onClick={goNext} className="gap-2">
+                Continue
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-          </Container>
-
-          {/* Hawl reminder */}
-          <Container className="!p-4 bg-muted/20">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">⚠ Important Conditions</p>
-            <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
-              <li>
-                <strong className="text-foreground">Hawl (Lunar Year):</strong> Zakat is only obligatory if your wealth
-                has remained above the nisab for one complete lunar year.
-              </li>
-              <li>
-                <strong className="text-foreground">Primary home:</strong> Your personal residence is not zakatable.
-              </li>
-              <li>
-                <strong className="text-foreground">Personal vehicle & tools:</strong> Items for personal use or earning
-                a livelihood are generally exempt.
-              </li>
-              <li>
-                <strong className="text-foreground">Personal gold/silver:</strong> Scholars differ on jewellery in regular
-                use — consult your scholar.
-              </li>
-              <li>
-                <strong className="text-foreground">Disclaimer:</strong> This is an estimate only. Zakat rules vary by
-                madhab. Please consult a qualified scholar for your specific situation.
-              </li>
-            </ul>
-          </Container>
-
-        </div>
-      </section>
+          )}
+        </Container>
+      </div>
     </Layout>
   );
 };

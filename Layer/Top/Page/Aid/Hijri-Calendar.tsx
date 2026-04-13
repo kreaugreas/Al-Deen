@@ -3,6 +3,7 @@ import { Layout } from "@/Top/Component/Layout/Index";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/Top/Component/UI/Button";
 import { Container } from "@/Top/Component/UI/Container";
+import { DateDialog } from "@/Top/Component/Dialog/Date";
 
 interface HijriDate {
   day: string;
@@ -26,17 +27,19 @@ interface CalendarDay {
 const HijriCalendarPage = () => {
   const today = new Date();
 
-  // We navigate by Hijri month/year
   const [hijriMonth, setHijriMonth] = useState<number | null>(null);
   const [hijriYear, setHijriYear] = useState<number | null>(null);
   const [days, setDays] = useState<CalendarDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<CalendarDay | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeDate, setActiveDate] = useState<string | null>(null);
 
   const todayStr = `${String(today.getDate()).padStart(2, "0")}-${String(today.getMonth() + 1).padStart(2, "0")}-${today.getFullYear()}`;
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Step 1: On mount, get today's Hijri date to know which Hijri month we're in
+  // Step 1: On mount, get today's Hijri date
   useEffect(() => {
     fetch(`https://api.aladhan.com/v1/gToH/${String(today.getDate()).padStart(2, "0")}-${String(today.getMonth() + 1).padStart(2, "0")}-${today.getFullYear()}`)
       .then((res) => res.json())
@@ -49,7 +52,7 @@ const HijriCalendarPage = () => {
       .catch(console.error);
   }, []);
 
-  // Step 2: Whenever hijriMonth/hijriYear are set, fetch the full Hijri month calendar
+  // Step 2: Fetch the full Hijri month calendar
   useEffect(() => {
     if (hijriMonth === null || hijriYear === null) return;
 
@@ -64,6 +67,9 @@ const HijriCalendarPage = () => {
       .then((data) => {
         if (data.code === 200 && data.data) {
           setDays(data.data);
+          // Set today's date as active by default
+          const todayDateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+          setActiveDate(todayDateStr);
         } else {
           setError("Failed to load calendar data");
         }
@@ -95,13 +101,17 @@ const HijriCalendarPage = () => {
     }
   };
 
+  const handleDayClick = (day: CalendarDay) => {
+    setSelectedDay(day);
+    setModalOpen(true);
+  };
+
   const getOffset = () => {
     if (days.length === 0) return 0;
     const firstDayName = days[0].gregorian.weekday.en;
     return weekDays.indexOf(firstDayName);
   };
 
-  // Header labels
   const hijriMonthName = days.length > 0
     ? `${days[0].hijri.month.en} ${days[0].hijri.year} AH`
     : "";
@@ -113,6 +123,15 @@ const HijriCalendarPage = () => {
         return `${first.month.en} ${first.day} – ${last.month.en} ${last.day}, ${last.year}`;
       })()
     : "";
+
+  const isToday = (day: CalendarDay): boolean => {
+    return day.gregorian.date === todayStr;
+  };
+
+  const isActive = (day: CalendarDay): boolean => {
+    const dateStr = `${day.gregorian.year}-${day.gregorian.month.number}-${parseInt(day.gregorian.day)}`;
+    return activeDate === dateStr;
+  };
 
   return (
     <Layout>
@@ -145,7 +164,7 @@ const HijriCalendarPage = () => {
             </Container>
           ) : (
             <div>
-              {/* Weekday labels — each in its own thin Container */}
+              {/* Weekday labels */}
               <div className="grid grid-cols-7 gap-1 mb-1">
                 {weekDays.map((d) => (
                   <Container key={d} className="!py-1 !px-0 text-center">
@@ -155,36 +174,66 @@ const HijriCalendarPage = () => {
               </div>
 
               {/* Calendar grid */}
-              <div className="grid grid-cols-7 gap-1">
-                {/* Offset empty cells */}
-                {Array.from({ length: getOffset() }).map((_, i) => (
-                  <div key={`empty-${i}`} />
-                ))}
+<div className="grid grid-cols-7 gap-1">
+  {Array.from({ length: getOffset() }).map((_, i) => (
+    <div key={`empty-${i}`} />
+  ))}
 
-                {/* Day cells: Hijri day large, Gregorian day small below */}
-                {days.map((day) => {
-                  const isToday = day.gregorian.date === todayStr;
-                  return (
-                    <Container
-                      key={day.gregorian.date}
-                      className={`!py-2 !px-1 text-center ${isToday ? "ring-1 ring-primary/40 bg-primary/5" : ""}`}
-                    >
-                      {/* Hijri day — primary */}
-                      <p className={`text-sm font-semibold leading-tight ${isToday ? "text-primary" : ""}`}>
-                        {day.hijri.day}
-                      </p>
-                      {/* Gregorian day — secondary */}
-                      <p className="text-xs text-muted-foreground leading-tight mt-0.5">
-                        {day.gregorian.day}
-                      </p>
-                    </Container>
-                  );
-                })}
-              </div>
+  {days.map((day) => {
+    const todayFlag = isToday(day);
+    const activeFlag = isActive(day);
+
+    return (
+      <button
+        key={day.gregorian.date}
+        onClick={() => handleDayClick(day)}
+        className={`
+          group relative rounded-[40px] transition-all duration-200 py-2 px-1 text-center
+          focus:outline-none focus:ring-2 focus:ring-primary
+          ${
+            activeFlag
+              ? "bg-black dark:bg-white border-2 border-white dark:border-black hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white hover:border-black dark:hover:border-white"
+              : "bg-white dark:bg-black border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black hover:border-white dark:hover:border-black"
+          }
+        `}
+      >
+        {/* Hijri day */}
+        <p className={`
+          text-sm font-semibold leading-tight
+          ${activeFlag 
+            ? "text-white dark:text-black group-hover:text-black dark:group-hover:text-white" 
+            : "text-black dark:text-white group-hover:text-white dark:group-hover:text-black"
+          }
+        `}>
+          {day.hijri.day}
+        </p>
+        {/* Gregorian day */}
+        <p className={`
+          text-xs leading-tight mt-0.5
+          ${activeFlag 
+            ? "text-white/70 dark:text-black/70 group-hover:text-black/70 dark:group-hover:text-white/70" 
+            : "text-muted-foreground group-hover:text-white/70 dark:group-hover:text-black/70"
+          }
+        `}>
+          {day.gregorian.day}
+        </p>
+      </button>
+    );
+  })}
+</div>
             </div>
           )}
         </div>
       </section>
+
+      {/* Date Dialog */}
+      <DateDialog
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        day={selectedDay}
+        hijriMonth={hijriMonth || 1}
+        hijriYear={hijriYear || 1446}
+      />
     </Layout>
   );
 };

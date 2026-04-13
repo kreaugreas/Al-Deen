@@ -1,5 +1,5 @@
 // Layer/Top/Component/Quran/Layout/Safhah/Ayah/Main.tsx
-import { Copy, MoreHorizontal, Bookmark, FileText, Share2, BookMarked } from "lucide-react";
+import { Copy, MoreHorizontal, Bookmark, FileText, Share2, BookMarked, BookOpen } from "lucide-react";
 import { cn } from "@/Middle/Library/utils";
 import { useBookmarks } from "@/Middle/Hook/Use-Bookmarks";
 import { useAuth } from "@/Middle/Context/Auth";
@@ -15,7 +15,7 @@ import { WordTooltip, useAudioPlayback } from "../Safhah/Utility";
 import { useState, useMemo } from "react";
 import { Container } from "@/Top/Component/UI/Container";
 import { Button } from "@/Top/Component/UI/Button";
-import type { VerseCardProps } from "./Types";
+import type { VerseCardProps } from "../Types";
 
 export function VerseCard({
   verse,
@@ -29,6 +29,7 @@ export function VerseCard({
   verseRef,
   onNotesClick,
   onShareClick,
+  onTafsirClick,               // ✅ NEW
   hoverTransliteration,
   inlineTransliteration,
 }: VerseCardProps) {
@@ -41,7 +42,6 @@ export function VerseCard({
 
   const [hoveredVerse, setHoveredVerse] = useState<number | null>(null);
 
-  // ✅ Combined tooltip enabled state - shows if EITHER translation OR transliteration is enabled
   const isTooltipEnabled = useMemo(() => {
     const hasTranslation = hoverTranslation !== "None" && hoverTranslation !== false;
     const hasTransliteration = hoverTransliteration !== "None";
@@ -60,7 +60,6 @@ export function VerseCard({
 
   const arabicFontSize = useMemo(() => `${(1.5 * fontSize) / 5}rem`, [fontSize]);
 
-  // Helper to get transliteration text for the verse
   const getTransliterationText = useMemo(() => {
     if (!showTransliteration) return null;
     if (verse.wbwTransliteration && verse.wbwTransliteration.length > 0) {
@@ -114,6 +113,7 @@ export function VerseCard({
 
           <div className="flex items-center gap-1">
             <TooltipProvider>
+              {/* Copy button */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button size="sm" className="p-1.5 rounded-lg" onClick={copyVerse}>
@@ -123,6 +123,7 @@ export function VerseCard({
                 <TooltipContent side="bottom">{t.quran.copy}</TooltipContent>
               </Tooltip>
 
+              {/* Bookmark button */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
@@ -145,6 +146,17 @@ export function VerseCard({
                 <TooltipContent side="bottom">{t.quran.bookmark}</TooltipContent>
               </Tooltip>
 
+              {/* ✅ Tafsir button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="sm" className="p-1.5 rounded-lg" onClick={onTafsirClick}>
+                    <BookOpen className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Tafsir</TooltipContent>
+              </Tooltip>
+
+              {/* More menu (Notes & Share) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="sm" className="p-1.5 rounded-lg">
@@ -179,7 +191,6 @@ export function VerseCard({
                 const belongsToVerse = verse.verseNumber;
                 const isVerseHighlighted = hoveredVerse !== null && belongsToVerse === hoveredVerse;
 
-                // Get translation and transliteration for this word
                 const translation = (!isVerseEnd && verse.wbwTranslation?.[idx]) || undefined;
                 const transliteration = (!isVerseEnd && verse.wbwTransliteration?.[idx]) || undefined;
                 
@@ -232,7 +243,7 @@ export function VerseCard({
                     key={idx}
                     translation={translation}
                     transliteration={transliteration}
-                    enabled={isTooltipEnabled}  // ✅ Use combined enabled state
+                    enabled={isTooltipEnabled}
                     onClick={handleClick}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
@@ -251,7 +262,7 @@ export function VerseCard({
           </div>
         )}
 
-        {/* Transliteration - shown between Arabic and Translation */}
+        {/* Transliteration */}
         {showTransliteration && getTransliterationText && (
           <div className="mb-4">
             <p 

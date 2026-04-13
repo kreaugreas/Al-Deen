@@ -1,11 +1,9 @@
-{
-  "id": "al-jawf",
-  "name": "Al-Jawf",
-  "arabicName": "الجوف",
-  "description": "The Oral/Throat Cavity",
-  "rules": [
-    { "letter": "ا", "transliteration": "Alif", "description": "Produced from the empty space in the mouth and throat when preceded by a Fathah", "example": "قَالَ", "exampleTranslation": "He said" },
-    { "letter": "و", "transliteration": "Waw (Madd)", "description": "Produced from the empty space when preceded by a Dammah", "example": "يَقُولُ", "exampleTranslation": "He says" },
-    { "letter": "ي", "transliteration": "Ya (Madd)", "description": "Produced from the empty space when preceded by a Kasrah", "example": "قِيلَ", "exampleTranslation": "It was said" }
+[
+  "الجوف",
+  "The Oral/Throat Cavity — 1 articulation point producing 3 letters (Madd letters)",
+  [
+    ["ا", "Alif (Madd)", "Produced from the empty space in the mouth when preceded by a Fathah", "قَالَ", "He said"],
+    ["و", "Waw (Madd)", "Produced from the empty space in the mouth when preceded by a Dammah", "يَقُولُ", "He says"],
+    ["ي", "Ya (Madd)", "Produced from the empty space in the mouth when preceded by a Kasrah", "قِيلَ", "It was said"]
   ]
-}
+]

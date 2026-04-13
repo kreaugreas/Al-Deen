@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect, useMemo, useCallback } from "react";
 
 export type QuranFontFamily = "uthmani" | "uthmani_v1" | "uthmani_v2" | "uthmani_v4" | "indopak";
 export type QuranLayout = "ayah" | "page";
@@ -26,25 +26,35 @@ interface AppContextType {
   translationFontSize: number;
   setTranslationFontSize: (size: number) => void;
   
+  // Prayer Times
+  prayerCalculationMethod: number;
+  setPrayerCalculationMethod: (method: number) => void;
+  prayerSchool: number;
+  setPrayerSchool: (school: number) => void;
+  prayerLatitudeMethod: number;
+  setPrayerLatitudeMethod: (method: number) => void;
+  prayerTimeFormat: "12h" | "24h";
+  setPrayerTimeFormat: (format: "12h" | "24h") => void;
+  prayerAutoLocation: boolean;
+  setPrayerAutoLocation: (enabled: boolean) => void;
+  prayerSavedLocation: { city: string; country: string; lat: number; lng: number } | null;
+  setPrayerSavedLocation: (location: { city: string; country: string; lat: number; lng: number } | null) => void;
+
   // Per-Word settings
-  // Translation settings (use translator IDs like "Direct", "Sahih", etc.)
-  hoverTranslation: string;                    // Changed from TransliteratorType
+  hoverTranslation: string;
   setHoverTranslation: (value: string) => void;
   hoverTranslationSize: number;
   setHoverTranslationSize: (size: number) => void;
-  // Transliteration settings (use transliterator IDs like "Standard", "Academic", etc.)
   hoverTransliteration: TransliteratorType;
   setHoverTransliteration: (value: TransliteratorType) => void;
   hoverTransliterationSize: number;
   setHoverTransliterationSize: (size: number) => void;
   hoverRecitation: boolean;
   setHoverRecitation: (enabled: boolean) => void;
-  // Inline Translation settings (use translator IDs)
-  inlineTranslation: string;                   // Changed from TransliteratorType
+  inlineTranslation: string;
   setInlineTranslation: (value: string) => void;
   inlineTranslationSize: number;
   setInlineTranslationSize: (size: number) => void;
-  // Inline Transliteration settings (use transliterator IDs)
   inlineTransliteration: TransliteratorType;
   setInlineTransliteration: (value: TransliteratorType) => void;
   inlineTransliterationSize: number;
@@ -64,11 +74,65 @@ interface AppContextType {
   selectedTranslator: string;
   setSelectedTranslator: (translator: string) => void;
   
-  // Hadith settings
+  // Hadith settings - General (main display)
   showHadithTranslation: boolean;
   setShowHadithTranslation: (enabled: boolean) => void;
   showHadithTransliteration: boolean;
   setShowHadithTransliteration: (enabled: boolean) => void;
+  
+  // Hadith settings - Inline (separate from General)
+  showHadithInlineTranslation: boolean;
+  setShowHadithInlineTranslation: (enabled: boolean) => void;
+  showHadithInlineTransliteration: boolean;
+  setShowHadithInlineTransliteration: (enabled: boolean) => void;
+  
+  // Hadith settings - Hover
+  showHadithHoverTranslation: boolean;
+  setShowHadithHoverTranslation: (enabled: boolean) => void;
+  showHadithHoverTransliteration: boolean;
+  setShowHadithHoverTransliteration: (enabled: boolean) => void;
+  
+  // Hadith font sizes
+  hadithArabicFontSize: number;
+  setHadithArabicFontSize: (size: number) => void;
+  hadithTranslationFontSize: number;
+  setHadithTranslationFontSize: (size: number) => void;
+  hadithTransliterationFontSize: number;
+  setHadithTransliterationFontSize: (size: number) => void;
+  hadithInlineTranslationFontSize: number;
+  setHadithInlineTranslationFontSize: (size: number) => void;
+  hadithInlineTransliterationFontSize: number;
+  setHadithInlineTransliterationFontSize: (size: number) => void;
+  
+  // Dua settings - General
+  showDuaTranslation: boolean;
+  setShowDuaTranslation: (enabled: boolean) => void;
+  showDuaTransliteration: boolean;
+  setShowDuaTransliteration: (enabled: boolean) => void;
+  
+  // Dua settings - Inline
+  showDuaInlineTranslation: boolean;
+  setShowDuaInlineTranslation: (enabled: boolean) => void;
+  showDuaInlineTransliteration: boolean;
+  setShowDuaInlineTransliteration: (enabled: boolean) => void;
+  
+  // Dua settings - Hover
+  showDuaHoverTranslation: boolean;
+  setShowDuaHoverTranslation: (enabled: boolean) => void;
+  showDuaHoverTransliteration: boolean;
+  setShowDuaHoverTransliteration: (enabled: boolean) => void;
+  
+  // Dua font sizes
+  duaArabicFontSize: number;
+  setDuaArabicFontSize: (size: number) => void;
+  duaTranslationFontSize: number;
+  setDuaTranslationFontSize: (size: number) => void;
+  duaTransliterationFontSize: number;
+  setDuaTransliterationFontSize: (size: number) => void;
+  duaInlineTranslationFontSize: number;
+  setDuaInlineTranslationFontSize: (size: number) => void;
+  duaInlineTransliterationFontSize: number;
+  setDuaInlineTransliterationFontSize: (size: number) => void;
   
   // Transliteration settings (Verse/Ayah level)
   transliterationSize: number;
@@ -88,13 +152,23 @@ interface PersistedSettings {
   quranFont: QuranFontFamily;
   fontSize: number;
   translationFontSize: number;
+  // Prayer Times
+  prayerCalculationMethod: number;
+  prayerSchool: number;
+  prayerLatitudeMethod: number;
+  prayerTimeFormat: "12h" | "24h";
+  prayerAutoLocation: boolean;
+  prayerSavedLocationCity: string;
+  prayerSavedLocationCountry: string;
+  prayerSavedLocationLat: number;
+  prayerSavedLocationLng: number;
   // Per-Word settings
-  hoverTranslation: string;                    // Changed from TransliteratorType
+  hoverTranslation: string;
   hoverTranslationSize: number;
   hoverTransliteration: TransliteratorType;
   hoverTransliterationSize: number;
   hoverRecitation: boolean;
-  inlineTranslation: string;                   // Changed from TransliteratorType
+  inlineTranslation: string;
   inlineTranslationSize: number;
   inlineTransliteration: TransliteratorType;
   inlineTransliterationSize: number;
@@ -107,6 +181,27 @@ interface PersistedSettings {
   // Hadith settings
   showHadithTranslation: boolean;
   showHadithTransliteration: boolean;
+  showHadithInlineTranslation: boolean;
+  showHadithInlineTransliteration: boolean;
+  showHadithHoverTranslation: boolean;
+  showHadithHoverTransliteration: boolean;
+  hadithArabicFontSize: number;
+  hadithTranslationFontSize: number;
+  hadithTransliterationFontSize: number;
+  hadithInlineTranslationFontSize: number;
+  hadithInlineTransliterationFontSize: number;
+  // Dua settings
+  showDuaTranslation: boolean;
+  showDuaTransliteration: boolean;
+  showDuaInlineTranslation: boolean;
+  showDuaInlineTransliteration: boolean;
+  showDuaHoverTranslation: boolean;
+  showDuaHoverTransliteration: boolean;
+  duaArabicFontSize: number;
+  duaTranslationFontSize: number;
+  duaTransliterationFontSize: number;
+  duaInlineTranslationFontSize: number;
+  duaInlineTransliterationFontSize: number;
   // Transliteration settings (Verse/Ayah level)
   transliterationSize: number;
   selectedAyahTransliterator: TransliteratorType;
@@ -119,13 +214,23 @@ const DEFAULTS: PersistedSettings = {
   quranFont: "uthmani",
   fontSize: 5,
   translationFontSize: 3,
+  // Prayer Times defaults
+  prayerCalculationMethod: 2,
+  prayerSchool: 0,
+  prayerLatitudeMethod: 3,
+  prayerTimeFormat: "12h",
+  prayerAutoLocation: true,
+  prayerSavedLocationCity: "",
+  prayerSavedLocationCountry: "",
+  prayerSavedLocationLat: 0,
+  prayerSavedLocationLng: 0,
   // Per-Word defaults
-  hoverTranslation: "Direct",                  // Changed from "Standard"
+  hoverTranslation: "Direct",
   hoverTranslationSize: 3,
   hoverTransliteration: "None",
   hoverTransliterationSize: 3,
   hoverRecitation: true,
-  inlineTranslation: "None",                   // Changed from "None" (still string)
+  inlineTranslation: "None",
   inlineTranslationSize: 3,
   inlineTransliteration: "None",
   inlineTransliterationSize: 3,
@@ -138,7 +243,28 @@ const DEFAULTS: PersistedSettings = {
   // Hadith defaults
   showHadithTranslation: true,
   showHadithTransliteration: false,
-  // Transliteration defaults (Verse/Ayah level)
+  showHadithInlineTranslation: true,
+  showHadithInlineTransliteration: false,
+  showHadithHoverTranslation: false,
+  showHadithHoverTransliteration: false,
+  hadithArabicFontSize: 5,
+  hadithTranslationFontSize: 3,
+  hadithTransliterationFontSize: 3,
+  hadithInlineTranslationFontSize: 2,
+  hadithInlineTransliterationFontSize: 2,
+  // Dua defaults
+  showDuaTranslation: true,
+  showDuaTransliteration: false,
+  showDuaInlineTranslation: true,
+  showDuaInlineTransliteration: false,
+  showDuaHoverTranslation: false,
+  showDuaHoverTransliteration: false,
+  duaArabicFontSize: 5,
+  duaTranslationFontSize: 3,
+  duaTransliterationFontSize: 3,
+  duaInlineTranslationFontSize: 2,
+  duaInlineTransliterationFontSize: 2,
+  // Transliteration defaults
   transliterationSize: 3,
   selectedAyahTransliterator: "None",
 };
@@ -159,46 +285,93 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const initial = useMemo(() => loadSettings(), []);
 
   const [isSettingsSidebarOpen, setSettingsSidebarOpen] = useState(false);
-  const [isSearchSidebarOpen, setSearchSidebarOpen]     = useState(false);
+  const [isSearchSidebarOpen, setSearchSidebarOpen] = useState(false);
   const [isQuranNavSidebarOpen, setQuranNavSidebarOpen] = useState(false);
 
-  const [layout, setLayout]                         = useState<QuranLayout>(initial.layout);
-  const [currentLanguage, setCurrentLanguage]       = useState(initial.currentLanguage);
-  const [theme, setTheme]                           = useState<"auto" | "light" | "dark">(initial.theme);
-  const [quranFont, setQuranFont]                   = useState<QuranFontFamily>(initial.quranFont);
-  const [fontSize, setFontSize]                     = useState(initial.fontSize);
+  const [layout, setLayout] = useState<QuranLayout>(initial.layout);
+  const [currentLanguage, setCurrentLanguage] = useState(initial.currentLanguage);
+  const [theme, setTheme] = useState<"auto" | "light" | "dark">(initial.theme);
+  const [quranFont, setQuranFont] = useState<QuranFontFamily>(initial.quranFont);
+  const [fontSize, setFontSize] = useState(initial.fontSize);
   const [translationFontSize, setTranslationFontSize] = useState(initial.translationFontSize);
   
+  // Prayer Times settings
+  const [prayerCalculationMethod, setPrayerCalculationMethod] = useState(initial.prayerCalculationMethod);
+  const [prayerSchool, setPrayerSchool] = useState(initial.prayerSchool);
+  const [prayerLatitudeMethod, setPrayerLatitudeMethod] = useState(initial.prayerLatitudeMethod);
+  const [prayerTimeFormat, setPrayerTimeFormat] = useState<"12h" | "24h">(initial.prayerTimeFormat);
+  const [prayerAutoLocation, setPrayerAutoLocation] = useState(initial.prayerAutoLocation);
+  const [prayerSavedLocation, setPrayerSavedLocationState] = useState<{ city: string; country: string; lat: number; lng: number } | null>(
+    initial.prayerSavedLocationCity ? {
+      city: initial.prayerSavedLocationCity,
+      country: initial.prayerSavedLocationCountry,
+      lat: initial.prayerSavedLocationLat,
+      lng: initial.prayerSavedLocationLng,
+    } : null
+  );
+
+  const setPrayerSavedLocation = useCallback((location: { city: string; country: string; lat: number; lng: number } | null) => {
+    setPrayerSavedLocationState(location);
+  }, []);
+  
   // Per-Word settings
-  const [hoverTranslation, setHoverTranslation]                     = useState<string>(initial.hoverTranslation);
-  const [hoverTranslationSize, setHoverTranslationSize]             = useState(initial.hoverTranslationSize);
-  const [hoverTransliteration, setHoverTransliteration]             = useState<TransliteratorType>(initial.hoverTransliteration);
-  const [hoverTransliterationSize, setHoverTransliterationSize]     = useState(initial.hoverTransliterationSize);
-  const [hoverRecitation, setHoverRecitation]                       = useState(initial.hoverRecitation);
-  const [inlineTranslation, setInlineTranslation]                   = useState<string>(initial.inlineTranslation);
-  const [inlineTranslationSize, setInlineTranslationSize]           = useState(initial.inlineTranslationSize);
-  const [inlineTransliteration, setInlineTransliteration]           = useState<TransliteratorType>(initial.inlineTransliteration);
-  const [inlineTransliterationSize, setInlineTransliterationSize]   = useState(initial.inlineTransliterationSize);
+  const [hoverTranslation, setHoverTranslation] = useState<string>(initial.hoverTranslation);
+  const [hoverTranslationSize, setHoverTranslationSize] = useState(initial.hoverTranslationSize);
+  const [hoverTransliteration, setHoverTransliteration] = useState<TransliteratorType>(initial.hoverTransliteration);
+  const [hoverTransliterationSize, setHoverTransliterationSize] = useState(initial.hoverTransliterationSize);
+  const [hoverRecitation, setHoverRecitation] = useState(initial.hoverRecitation);
+  const [inlineTranslation, setInlineTranslation] = useState<string>(initial.inlineTranslation);
+  const [inlineTranslationSize, setInlineTranslationSize] = useState(initial.inlineTranslationSize);
+  const [inlineTransliteration, setInlineTransliteration] = useState<TransliteratorType>(initial.inlineTransliteration);
+  const [inlineTransliterationSize, setInlineTransliterationSize] = useState(initial.inlineTransliterationSize);
   
   // Verse-level settings
-  const [verseTranslation, setVerseTranslation]           = useState(initial.verseTranslation);
+  const [verseTranslation, setVerseTranslation] = useState(initial.verseTranslation);
   const [autoScrollDuringPlayback, setAutoScrollDuringPlayback] = useState(initial.autoScrollDuringPlayback);
-  const [selectedTranslations, setSelectedTranslations]   = useState<string[]>(["translation"]);
-  const [showArabicText, setShowArabicText]               = useState(initial.showArabicText);
-  const [selectedReciter, setSelectedReciter]             = useState(initial.selectedReciter);
-  const [selectedTranslator, setSelectedTranslator]       = useState(initial.selectedTranslator);
+  const [selectedTranslations, setSelectedTranslations] = useState<string[]>(["translation"]);
+  const [showArabicText, setShowArabicText] = useState(initial.showArabicText);
+  const [selectedReciter, setSelectedReciter] = useState(initial.selectedReciter);
+  const [selectedTranslator, setSelectedTranslator] = useState(initial.selectedTranslator);
   
   // Hadith settings
   const [showHadithTranslation, setShowHadithTranslation] = useState(initial.showHadithTranslation);
   const [showHadithTransliteration, setShowHadithTransliteration] = useState(initial.showHadithTransliteration);
+  const [showHadithInlineTranslation, setShowHadithInlineTranslation] = useState(initial.showHadithInlineTranslation);
+  const [showHadithInlineTransliteration, setShowHadithInlineTransliteration] = useState(initial.showHadithInlineTransliteration);
+  const [showHadithHoverTranslation, setShowHadithHoverTranslation] = useState(initial.showHadithHoverTranslation);
+  const [showHadithHoverTransliteration, setShowHadithHoverTransliteration] = useState(initial.showHadithHoverTransliteration);
+  const [hadithArabicFontSize, setHadithArabicFontSize] = useState(initial.hadithArabicFontSize);
+  const [hadithTranslationFontSize, setHadithTranslationFontSize] = useState(initial.hadithTranslationFontSize);
+  const [hadithTransliterationFontSize, setHadithTransliterationFontSize] = useState(initial.hadithTransliterationFontSize);
+  const [hadithInlineTranslationFontSize, setHadithInlineTranslationFontSize] = useState(initial.hadithInlineTranslationFontSize);
+  const [hadithInlineTransliterationFontSize, setHadithInlineTransliterationFontSize] = useState(initial.hadithInlineTransliterationFontSize);
 
-  // Transliteration settings (Verse/Ayah level)
+  // Dua settings
+  const [showDuaTranslation, setShowDuaTranslation] = useState(initial.showDuaTranslation);
+  const [showDuaTransliteration, setShowDuaTransliteration] = useState(initial.showDuaTransliteration);
+  const [showDuaInlineTranslation, setShowDuaInlineTranslation] = useState(initial.showDuaInlineTranslation);
+  const [showDuaInlineTransliteration, setShowDuaInlineTransliteration] = useState(initial.showDuaInlineTransliteration);
+  const [showDuaHoverTranslation, setShowDuaHoverTranslation] = useState(initial.showDuaHoverTranslation);
+  const [showDuaHoverTransliteration, setShowDuaHoverTransliteration] = useState(initial.showDuaHoverTransliteration);
+  const [duaArabicFontSize, setDuaArabicFontSize] = useState(initial.duaArabicFontSize);
+  const [duaTranslationFontSize, setDuaTranslationFontSize] = useState(initial.duaTranslationFontSize);
+  const [duaTransliterationFontSize, setDuaTransliterationFontSize] = useState(initial.duaTransliterationFontSize);
+  const [duaInlineTranslationFontSize, setDuaInlineTranslationFontSize] = useState(initial.duaInlineTranslationFontSize);
+  const [duaInlineTransliterationFontSize, setDuaInlineTransliterationFontSize] = useState(initial.duaInlineTransliterationFontSize);
+
+  // Transliteration settings
   const [transliterationSize, setTransliterationSize] = useState(initial.transliterationSize);
   const [selectedAyahTransliterator, setSelectedAyahTransliterator] = useState<TransliteratorType>(initial.selectedAyahTransliterator);
 
   useEffect(() => {
     saveSettings({
       currentLanguage, theme, layout, quranFont, fontSize, translationFontSize,
+      prayerCalculationMethod, prayerSchool, prayerLatitudeMethod, prayerTimeFormat,
+      prayerAutoLocation,
+      prayerSavedLocationCity: prayerSavedLocation?.city || "",
+      prayerSavedLocationCountry: prayerSavedLocation?.country || "",
+      prayerSavedLocationLat: prayerSavedLocation?.lat || 0,
+      prayerSavedLocationLng: prayerSavedLocation?.lng || 0,
       hoverTranslation, hoverTranslationSize,
       hoverTransliteration, hoverTransliterationSize,
       hoverRecitation,
@@ -207,10 +380,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       verseTranslation, autoScrollDuringPlayback, showArabicText,
       selectedReciter, selectedTranslator,
       showHadithTranslation, showHadithTransliteration,
+      showHadithInlineTranslation, showHadithInlineTransliteration,
+      showHadithHoverTranslation, showHadithHoverTransliteration,
+      hadithArabicFontSize, hadithTranslationFontSize, hadithTransliterationFontSize,
+      hadithInlineTranslationFontSize, hadithInlineTransliterationFontSize,
+      showDuaTranslation, showDuaTransliteration,
+      showDuaInlineTranslation, showDuaInlineTransliteration,
+      showDuaHoverTranslation, showDuaHoverTransliteration,
+      duaArabicFontSize, duaTranslationFontSize, duaTransliterationFontSize,
+      duaInlineTranslationFontSize, duaInlineTransliterationFontSize,
       transliterationSize, selectedAyahTransliterator,
     });
   }, [
     currentLanguage, theme, layout, quranFont, fontSize, translationFontSize,
+    prayerCalculationMethod, prayerSchool, prayerLatitudeMethod, prayerTimeFormat,
+    prayerAutoLocation, prayerSavedLocation,
     hoverTranslation, hoverTranslationSize,
     hoverTransliteration, hoverTransliterationSize,
     hoverRecitation,
@@ -219,6 +403,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     verseTranslation, autoScrollDuringPlayback, showArabicText,
     selectedReciter, selectedTranslator,
     showHadithTranslation, showHadithTransliteration,
+    showHadithInlineTranslation, showHadithInlineTransliteration,
+    showHadithHoverTranslation, showHadithHoverTransliteration,
+    hadithArabicFontSize, hadithTranslationFontSize, hadithTransliterationFontSize,
+    hadithInlineTranslationFontSize, hadithInlineTransliterationFontSize,
+    showDuaTranslation, showDuaTransliteration,
+    showDuaInlineTranslation, showDuaInlineTransliteration,
+    showDuaHoverTranslation, showDuaHoverTransliteration,
+    duaArabicFontSize, duaTranslationFontSize, duaTransliterationFontSize,
+    duaInlineTranslationFontSize, duaInlineTransliterationFontSize,
     transliterationSize, selectedAyahTransliterator,
   ]);
 
@@ -246,6 +439,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     quranFont, setQuranFont,
     fontSize, setFontSize,
     translationFontSize, setTranslationFontSize,
+    prayerCalculationMethod, setPrayerCalculationMethod,
+    prayerSchool, setPrayerSchool,
+    prayerLatitudeMethod, setPrayerLatitudeMethod,
+    prayerTimeFormat, setPrayerTimeFormat,
+    prayerAutoLocation, setPrayerAutoLocation,
+    prayerSavedLocation, setPrayerSavedLocation,
     hoverTranslation, setHoverTranslation,
     hoverTranslationSize, setHoverTranslationSize,
     hoverTransliteration, setHoverTransliteration,
@@ -263,12 +462,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
     selectedTranslator, setSelectedTranslator,
     showHadithTranslation, setShowHadithTranslation,
     showHadithTransliteration, setShowHadithTransliteration,
+    showHadithInlineTranslation, setShowHadithInlineTranslation,
+    showHadithInlineTransliteration, setShowHadithInlineTransliteration,
+    showHadithHoverTranslation, setShowHadithHoverTranslation,
+    showHadithHoverTransliteration, setShowHadithHoverTransliteration,
+    hadithArabicFontSize, setHadithArabicFontSize,
+    hadithTranslationFontSize, setHadithTranslationFontSize,
+    hadithTransliterationFontSize, setHadithTransliterationFontSize,
+    hadithInlineTranslationFontSize, setHadithInlineTranslationFontSize,
+    hadithInlineTransliterationFontSize, setHadithInlineTransliterationFontSize,
+    showDuaTranslation, setShowDuaTranslation,
+    showDuaTransliteration, setShowDuaTransliteration,
+    showDuaInlineTranslation, setShowDuaInlineTranslation,
+    showDuaInlineTransliteration, setShowDuaInlineTransliteration,
+    showDuaHoverTranslation, setShowDuaHoverTranslation,
+    showDuaHoverTransliteration, setShowDuaHoverTransliteration,
+    duaArabicFontSize, setDuaArabicFontSize,
+    duaTranslationFontSize, setDuaTranslationFontSize,
+    duaTransliterationFontSize, setDuaTransliterationFontSize,
+    duaInlineTranslationFontSize, setDuaInlineTranslationFontSize,
+    duaInlineTransliterationFontSize, setDuaInlineTransliterationFontSize,
     transliterationSize, setTransliterationSize,
     selectedAyahTransliterator, setSelectedAyahTransliterator,
   }), [
     isSettingsSidebarOpen, isSearchSidebarOpen, isQuranNavSidebarOpen,
     layout, currentLanguage, theme,
     quranFont, fontSize, translationFontSize,
+    prayerCalculationMethod, prayerSchool, prayerLatitudeMethod, prayerTimeFormat,
+    prayerAutoLocation, setPrayerAutoLocation,
+    prayerSavedLocation, setPrayerSavedLocation,
     hoverTranslation, hoverTranslationSize,
     hoverTransliteration, hoverTransliterationSize,
     hoverRecitation,
@@ -277,6 +499,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     verseTranslation, autoScrollDuringPlayback, selectedTranslations, showArabicText,
     selectedReciter, selectedTranslator,
     showHadithTranslation, showHadithTransliteration,
+    showHadithInlineTranslation, showHadithInlineTransliteration,
+    showHadithHoverTranslation, showHadithHoverTransliteration,
+    hadithArabicFontSize, hadithTranslationFontSize, hadithTransliterationFontSize,
+    hadithInlineTranslationFontSize, hadithInlineTransliterationFontSize,
+    showDuaTranslation, showDuaTransliteration,
+    showDuaInlineTranslation, showDuaInlineTransliteration,
+    showDuaHoverTranslation, showDuaHoverTransliteration,
+    duaArabicFontSize, duaTranslationFontSize, duaTransliterationFontSize,
+    duaInlineTranslationFontSize, duaInlineTransliterationFontSize,
     transliterationSize, selectedAyahTransliterator,
   ]);
 

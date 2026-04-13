@@ -1,4 +1,4 @@
-import { Info, Play, Pause, Loader2 } from "lucide-react";
+import { Info, Play, Pause, Loader2, BookOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/Top/Component/UI/tooltip";
 import { useAudio } from "@/Middle/Context/Audio";
 import { useTranslation } from "@/Middle/Hook/Use-Translation";
@@ -13,6 +13,7 @@ interface SurahHeaderProps {
   fontClass: string;          // for the Bismillah
   arabicFontSize: string;
   onInfoClick: () => void;
+  onTafsirClick: () => void;   // ✅ NEW – opens Tafsir dialog starting at verse 1
   onAudioClick: () => void;
 }
 
@@ -22,6 +23,7 @@ export function SurahHeader({
   fontClass,
   arabicFontSize,
   onInfoClick,
+  onTafsirClick,               // ✅ NEW
   onAudioClick,
 }: SurahHeaderProps) {
   const { t } = useTranslation();
@@ -84,6 +86,20 @@ export function SurahHeader({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">{t.quran.surahInfo}</TooltipContent>
+              </Tooltip>
+
+              {/* ✅ NEW – Tafsir button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    onClick={onTafsirClick}
+                    aria-label="View Tafsir"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Tafsir (Verse 1)</TooltipContent>
               </Tooltip>
 
               <Tooltip>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/Top/Component/Layout/Index";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
+import { Container } from "@/Top/Component/UI/Container";
+import { Button } from "@/Top/Component/UI/Button";
 import { usePrayerTimes } from "@/Middle/Hook/usePrayerTimes";
 import { Header } from "@/Top/Component/Aid/Prayer/Header";
-import { Settings } from "@/Top/Component/Aid/Prayer/Settings";
 import { NextPrayer } from "@/Top/Component/Aid/Prayer/NextPrayer";
 import { PrayerCard } from "@/Top/Component/Aid/Prayer/PrayerCard";
 import { AdditionalTimes } from "@/Top/Component/Aid/Prayer/AdditionalTimes";
@@ -17,14 +18,12 @@ export default function PrayerPage() {
     hijri,
     loading,
     error,
-    dateStr,
     settings,
-    updateSetting,
     requestLocation,
     methodLabel,
+    isUsingSavedLocation,
   } = usePrayerTimes();
 
-  const [showSettings, setShowSettings] = useState(false);
   const [, setTick] = useState(0);
 
   // Tick every minute to update progress
@@ -36,27 +35,35 @@ export default function PrayerPage() {
   const nextPrayer = timings ? getNextPrayer(timings) : null;
   const progress = timings && nextPrayer ? getElapsedProgress(timings, nextPrayer) : 0;
 
+  // Loading state
   if (loading) {
     return (
       <Layout>
         <div className="container max-w-2xl mx-auto py-6">
-          <div className="glass-card p-12 flex flex-col items-center justify-center gap-3">
+          <Container className="p-12 flex flex-col items-center justify-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-muted-foreground text-sm">Fetching prayer times...</p>
-          </div>
+          </Container>
         </div>
       </Layout>
     );
   }
 
+  // Error state - location not detected
   if (error) {
     return (
       <Layout>
         <div className="container max-w-2xl mx-auto py-6">
-          <div className="glass-card p-8 text-center">
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <button className="glass-btn px-4 py-2" onClick={requestLocation}>Try Again</button>
-          </div>
+          <Container className="p-8 text-center space-y-4">
+            <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+            <p className="text-muted-foreground">{error}</p>
+            <p className="text-sm text-muted-foreground">
+              Please select a location in Settings to get prayer times.
+            </p>
+            <Button onClick={requestLocation} variant="secondary">
+              Try Auto Location Again
+            </Button>
+          </Container>
         </div>
       </Layout>
     );
@@ -69,35 +76,12 @@ export default function PrayerPage() {
       <div className="container max-w-2xl mx-auto py-6">
         <Header
           location={location}
-          showSettings={showSettings}
-          onToggleSettings={() => setShowSettings(!showSettings)}
+          hijri={hijri}
           onRefresh={requestLocation}
         />
 
-        {/* Hijri Date */}
-        {hijri && (
-          <p className="text-sm text-muted-foreground mb-4 font-arabic">
-            {hijri.day} {hijri.month.ar} {hijri.year} {hijri.designation.abbreviated}
-            <span className="mx-2 opacity-30">•</span>
-            <span className="font-sans">{hijri.day} {hijri.month.en} {hijri.year} {hijri.designation.abbreviated}</span>
-          </p>
-        )}
-
-        {/* Settings Panel */}
-        {showSettings && <Settings settings={settings} onUpdate={updateSetting} />}
-
         {/* Prayer Times Content */}
         <div className="space-y-3">
-          {/* Next prayer highlight */}
-          {nextPrayer && (
-            <NextPrayer
-              nextPrayer={nextPrayer}
-              timings={timings}
-              settings={settings}
-              progress={progress}
-            />
-          )}
-
           {/* All prayers */}
           {MAIN_PRAYERS.map((prayer) => (
             <PrayerCard
@@ -112,8 +96,10 @@ export default function PrayerPage() {
           {/* Imsak & Midnight */}
           <AdditionalTimes timings={timings} settings={settings} />
 
+          {/* Footer: method and manual location indicator */}
           <p className="text-xs text-muted-foreground text-center pt-2">
-            {dateStr} • {methodLabel}
+            {methodLabel}
+            {isUsingSavedLocation && " • Manual Location"}
           </p>
         </div>
       </div>

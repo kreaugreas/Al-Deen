@@ -1,6 +1,6 @@
 // Layer/Top/Component/Quran/Layout/Safhah/Ayah/Index.tsx
 import { VerseCard } from "./Main";
-import type { AyahViewProps } from "./Types";
+import type { AyahViewProps } from "../Types";
 
 export function AyahView({
   surah,
@@ -14,15 +14,15 @@ export function AyahView({
   verseRefs,
   onNotesClick,
   onShareClick,
-  hoverTransliteration,  // ✅ ADD
-  inlineTransliteration,  // ✅ ADD
+  onTafsirClick,                // ✅ NEW
+  hoverTransliteration,
+  inlineTransliteration,
 }: AyahViewProps) {
   if (!verses || !Array.isArray(verses)) {
     console.warn('AyahView: verses is undefined or not an array', verses);
     return null;
   }
 
-  // Determine if transliteration should show (not "None")
   const showTransliteration = selectedAyahTransliterator !== "None";
 
   return (
@@ -41,8 +41,9 @@ export function AyahView({
           verseRef={(el) => { if (el) verseRefs.current.set(verse.verseNumber, el); }}
           onNotesClick={() => onNotesClick(verse.verseNumber, verse.arabic)}
           onShareClick={() => onShareClick(verse.verseNumber, verse.arabic, verse.translation)}
-          hoverTransliteration={hoverTransliteration}  // ✅ PASS
-          inlineTransliteration={inlineTransliteration}  // ✅ PASS
+          onTafsirClick={() => onTafsirClick(verse.verseNumber)}   // ✅ NEW
+          hoverTransliteration={hoverTransliteration}
+          inlineTransliteration={inlineTransliteration}
         />
       ))}
     </div>

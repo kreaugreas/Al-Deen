@@ -11,6 +11,8 @@ export function PageView({
   assembledSurah,
   showArabicText,
   hoverTranslation,
+  inlineTranslation,
+  inlineTransliteration,
   fontClass,
   arabicFontSize,
   translationFontSize,
@@ -23,45 +25,38 @@ export function PageView({
   const { activeVerse, activeWord, playAyah } = useAudio();
   const [hoveredVerse, setHoveredVerse] = useState<number | null>(null);
 
-  // Helper to check if hover translation is enabled
   const isHoverTranslationEnabled = useMemo(() => {
     return hoverTranslation !== "None" && hoverTranslation !== false;
   }, [hoverTranslation]);
 
-  // Get actual page segments from the page map
   const pages = useMemo(() => {
     const startPage = surah.pages[0];
     const endPage = surah.pages[1];
     const result: { pageNumber: number; verses: AssembledVerse[] }[] = [];
-    
-    // Create a map for quick verse lookup
+
     const verseMap = new Map<number, AssembledVerse>();
     for (const verse of verses) {
       verseMap.set(verse.verseNumber, verse);
     }
-    
+
     for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
       const segments = getPageSegments(pageNum);
       if (!segments) continue;
-      
-      // Find the segment that belongs to this surah
-      const surahSegment = segments.find(seg => seg.surah === surah.id);
+
+      const surahSegment = segments.find((seg) => seg.surah === surah.id);
       if (!surahSegment) continue;
-      
-      // Collect all verses from startVerse to endVerse
+
       const pageVerses: AssembledVerse[] = [];
       for (let verseNum = surahSegment.startVerse; verseNum <= surahSegment.endVerse; verseNum++) {
         const verse = verseMap.get(verseNum);
-        if (verse) {
-          pageVerses.push(verse);
-        }
+        if (verse) pageVerses.push(verse);
       }
-      
+
       if (pageVerses.length > 0) {
         result.push({ pageNumber: pageNum, verses: pageVerses });
       }
     }
-    
+
     return result;
   }, [surah, verses]);
 
@@ -84,24 +79,24 @@ export function PageView({
         const glyph = verse?.words[wordIndex] ?? ref;
         const isVerseEnd = !!verse && wordIndex === verse.words.length - 1;
         const isVerseNumber = verse === null;
-        
+
         let verseNumber: number | undefined;
-        if (isVerseNumber && glyph.includes(':')) {
-          const parts = glyph.split(':');
+        if (isVerseNumber && glyph.includes(":")) {
+          const parts = glyph.split(":");
           verseNumber = parseInt(parts[0], 10);
         }
 
-        // Get word-level transliteration if available
-        const transliteration = (!isVerseEnd && verse?.wbwTransliteration?.[wordIndex]) || undefined;
+        const transliteration =
+          (!isVerseEnd && verse?.wbwTransliteration?.[wordIndex]) || undefined;
 
-        return { 
-          glyph, 
-          verse, 
-          wordIndex, 
-          isVerseEnd, 
-          isVerseNumber, 
+        return {
+          glyph,
+          verse,
+          wordIndex,
+          isVerseEnd,
+          isVerseNumber,
           verseNumber,
-          transliteration  // ✅ ADDED
+          transliteration,
         };
       })
     );
@@ -112,26 +107,19 @@ export function PageView({
       const pageVerseNumbers = new Set(page.verses.map((v) => v.verseNumber));
       return resolvedLines.filter((line) =>
         line.some((word) => {
-          if (word.verse !== null) {
-            return pageVerseNumbers.has(word.verse.verseNumber);
-          }
-          if (word.isVerseNumber && word.verseNumber) {
-            return pageVerseNumbers.has(word.verseNumber);
-          }
+          if (word.verse !== null) return pageVerseNumbers.has(word.verse.verseNumber);
+          if (word.isVerseNumber && word.verseNumber) return pageVerseNumbers.has(word.verseNumber);
           return false;
         })
       );
     });
   }, [pages, resolvedLines]);
 
-  // Helper to get transliteration for a verse
   const getVerseTransliteration = (verse: AssembledVerse): string | null => {
     if (!showTransliteration) return null;
-    // If verse has word-by-word transliteration, join it
     if (verse.wbwTransliteration && verse.wbwTransliteration.length > 0) {
       return verse.wbwTransliteration.join(" ");
     }
-    // Fallback to verse-level transliteration
     return verse.transliteration || null;
   };
 
@@ -153,11 +141,12 @@ export function PageView({
                   setHoveredVerse={setHoveredVerse}
                   showTransliteration={showTransliteration}
                   transliterationFontSize={transliterationFontSize}
-                  hoverTranslation={hoverTranslation}  // ✅ PASSED
+                  hoverTranslation={hoverTranslation}
+                  inlineTranslation={inlineTranslation}
+                  inlineTransliteration={inlineTransliteration}
                 />
               ) : (
                 <div>
-                  {/* Arabic text */}
                   <div
                     className={`${fontClass} leading-[2.8] text-justify`}
                     dir="rtl"
@@ -167,10 +156,11 @@ export function PageView({
                       <span
                         key={verse.verseNumber}
                         ref={(el) => {
-                          if (el) verseRefs.current.set(
-                            verse.verseNumber,
-                            el as unknown as HTMLDivElement,
-                          );
+                          if (el)
+                            verseRefs.current.set(
+                              verse.verseNumber,
+                              el as unknown as HTMLDivElement,
+                            );
                         }}
                         className="inline"
                       >
@@ -183,13 +173,11 @@ export function PageView({
                                 ${verse.verseNumber === activeVerse && wIdx === activeWord
                                   ? "text-emerald-500 animate-pulse"
                                   : hoveredVerse === verse.verseNumber
-                                    ? "bg-primary/20 rounded px-0.5"
-                                    : "text-foreground"}
+                                  ? "bg-primary/20 rounded px-0.5"
+                                  : "text-foreground"}
                               `}
                               onClick={() => {
-                                if (isLastWord) {
-                                  playAyah(surah.id, verse.verseNumber);
-                                }
+                                if (isLastWord) playAyah(surah.id, verse.verseNumber);
                               }}
                               onMouseEnter={() => {
                                 if (isLastWord) setHoveredVerse(verse.verseNumber);
@@ -206,7 +194,6 @@ export function PageView({
                     ))}
                   </div>
 
-                  {/* Transliteration (below Arabic) */}
                   {showTransliteration && (
                     <div className="mt-4 space-y-2">
                       {page.verses.map((verse) => {
@@ -225,7 +212,6 @@ export function PageView({
                     </div>
                   )}
 
-                  {/* Translation */}
                   {isHoverTranslationEnabled && (
                     <div className="mt-2 space-y-1">
                       {page.verses.map((verse) => (
@@ -249,7 +235,6 @@ export function PageView({
 
             {!showArabicText && (
               <div className="space-y-4">
-                {/* When Arabic is hidden, show transliteration first (if enabled) */}
                 {showTransliteration && (
                   <div className="space-y-1">
                     {page.verses.map((verse) => {
@@ -271,8 +256,7 @@ export function PageView({
                     })}
                   </div>
                 )}
-                
-                {/* Translation */}
+
                 <div className="space-y-1">
                   {page.verses.map((verse) => (
                     <p
@@ -291,8 +275,7 @@ export function PageView({
               </div>
             )}
           </div>
-          
-          {/* Page number at bottom of container */}
+
           <div className="flex items-center justify-center pt-4 pb-2 mt-2">
             <span className="text-sm text-muted-foreground font-medium">
               {page.pageNumber}

@@ -1,10 +1,10 @@
 // ============= Vite / Next.js (Turbopack) =============
-const duaModules = import.meta.glob<{ default: string[][] }>(
+const duaModules = import.meta.glob<{ default: any[][] }>(
   "@/Bottom/Data/Aid/Dua/*.json",
   { eager: true }
 );
 
-const tajweedModules = import.meta.glob<{ default: TajweedCategory }>(
+const tajweedModules = import.meta.glob<{ default: any }>(
   "@/Bottom/Data/Aid/Tajweed/**/*.json",
   { eager: true }
 );
@@ -30,24 +30,22 @@ export interface TajweedSubcategory {
   rules: TajweedRule[];
 }
 
-export interface TajweedCategoryIntro {
+export interface TajweedSubfolder {
   id: string;
   name: string;
-  arabicName: string;
-  description: string;
-  icon: string;
-  color: string;
-  subcategories: string[];
+  subcategories: TajweedSubcategory[];
 }
 
-export interface TajweedCategory {
+export interface TajweedCategoryDetail {
   id: string;
   name: string;
   arabicName: string;
   description: string;
   icon: string;
   color: string;
-  subcategories: TajweedSubcategory[];
+  hasSubfolders: boolean;
+  subfolders: TajweedSubfolder[];
+  subcategories: TajweedSubcategory[]; // direct JSON files under the category
 }
 
 // ============= Alphabet Types =============
@@ -72,8 +70,11 @@ export interface Letter {
 // ============= Dua Types =============
 
 export interface DuaItem {
+  id: string;
   arabic: string;
+  transliteration?: string | string[];
   translation: string;
+  wbw?: string[];
   reference: string;
   audioUrl?: string;
 }
@@ -92,40 +93,125 @@ function formatNameFromId(filename: string): string {
     .join(" ");
 }
 
-// ============= Tajweed Data =============
-// Loads all JSON files across all Tajweed subfolders.
-// Introduction.json files (subcategories: string[]) are used as category
-// metadata; rule files (subcategories absent, rules present) are subcategories.
+function formatIdFromFilename(filename: string): string {
+  return filename.toLowerCase().replace(/ /g, "-");
+}
 
-const tajweedIntros: TajweedCategoryIntro[] = [];
-const tajweedSubcategories: TajweedSubcategory[] = [];
+/**
+ * Parse a reference string containing '#' delimiter.
+ * Example: "Abu Dawud #3850" => { text: "Abu Dawud", number: "3850" }
+ * Returns null if no '#' found.
+ */
+export function parseReference(ref: string): { text: string; number: string } | null {
+  const index = ref.indexOf('#');
+  if (index === -1) return null;
+  return {
+    text: ref.substring(0, index).trim(),
+    number: ref.substring(index + 1).trim()
+  };
+}
 
-for (const mod of Object.values(tajweedModules)) {
-  const data = mod.default as any;
-  if (Array.isArray(data.subcategories) && typeof data.subcategories[0] === "string") {
-    tajweedIntros.push(data as TajweedCategoryIntro);
-  } else if (Array.isArray(data.rules)) {
-    tajweedSubcategories.push(data as TajweedSubcategory);
+// ============= Tajweed Data – Hierarchical Build =============
+
+type FolderNode = {
+  name: string;
+  subfolders: Map<string, FolderNode>;
+  files: TajweedSubcategory[];
+};
+
+const categoryNodes: Map<string, FolderNode> = new Map();
+
+for (const [path, mod] of Object.entries(tajweedModules)) {
+  const data = mod.default;
+  const pathParts = path.split("/");
+  const tajweedIndex = pathParts.findIndex(part => part === "Tajweed");
+  if (tajweedIndex === -1 || tajweedIndex + 1 >= pathParts.length) continue;
+
+  const topFolder = pathParts[tajweedIndex + 1]; // e.g., "Makharij", "Sifaat"
+  let currentNode = categoryNodes.get(topFolder);
+  if (!currentNode) {
+    currentNode = { name: topFolder, subfolders: new Map(), files: [] };
+    categoryNodes.set(topFolder, currentNode);
+  }
+
+  // Traverse remaining path segments after the top folder
+  for (let i = tajweedIndex + 2; i < pathParts.length - 1; i++) {
+    const folderName = pathParts[i];
+    let next = currentNode.subfolders.get(folderName);
+    if (!next) {
+      next = { name: folderName, subfolders: new Map(), files: [] };
+      currentNode.subfolders.set(folderName, next);
+    }
+    currentNode = next;
+  }
+
+  // The file itself
+  const filename = pathParts[pathParts.length - 1].replace(".json", "");
+  const id = formatIdFromFilename(filename);
+  const name = formatNameFromId(filename);
+
+  if (Array.isArray(data) && data.length >= 2 && typeof data[0] === 'string' && typeof data[1] === 'string') {
+    const arabicName = data[0];
+    const description = data[1];
+    const rulesArray = data.length >= 3 && Array.isArray(data[2]) ? data[2] : [];
+    const rules: TajweedRule[] = rulesArray.map((rule: any[]) => ({
+      letter: rule[0],
+      transliteration: rule[1],
+      description: rule[2],
+      example: rule[3],
+      exampleTranslation: rule[4] || "",
+    }));
+    const subcategory: TajweedSubcategory = { id, name, arabicName, description, rules };
+    currentNode.files.push(subcategory);
   }
 }
 
-const tajweedCategories: TajweedCategory[] = tajweedIntros.map((intro) => ({
-  ...intro,
-  subcategories: intro.subcategories
-    .map((subId) => tajweedSubcategories.find((s) => s.id === subId))
-    .filter((s): s is TajweedSubcategory => s !== undefined),
+// Build category details from nodes
+const tajweedCategoryDetails: TajweedCategoryDetail[] = Array.from(categoryNodes.entries()).map(([folderName, node]) => {
+  const hasSubfolders = node.subfolders.size > 0;
+  const subfolders: TajweedSubfolder[] = Array.from(node.subfolders.entries()).map(([subName, subNode]) => ({
+    id: formatIdFromFilename(subName),
+    name: formatNameFromId(subName),
+    subcategories: subNode.files,
+  }));
+  const subcategories = node.files; // direct JSON files under the category
+
+  return {
+    id: formatIdFromFilename(folderName),
+    name: formatNameFromId(folderName),
+    arabicName: "",
+    description: hasSubfolders ? `${subfolders.length} sections` : `${subcategories.length} ${subcategories.length === 1 ? 'rule' : 'rules'}`,
+    icon: "BookOpen",
+    color: "#8B5CF6",
+    hasSubfolders,
+    subfolders,
+    subcategories,
+  };
+});
+
+// For backward compatibility, also provide flat list of categories (like before)
+export interface TajweedCategory {
+  id: string;
+  name: string;
+  arabicName: string;
+  description: string;
+  icon: string;
+  color: string;
+  subcategories: TajweedSubcategory[];
+}
+
+const tajweedCategoriesFlat: TajweedCategory[] = tajweedCategoryDetails.map(cat => ({
+  ...cat,
+  subcategories: cat.hasSubfolders ? [] : cat.subcategories, // for flat display, only direct files
 }));
 
 // ============= Dua Data =============
-// Automatically loads every *.json file inside the Dua folder.
-// Each file should contain an array of arrays: [[arabic, translation, reference], ...]
 
 const duaCategories: DuaCategory[] = Object.entries(duaModules).map(
   ([path, mod]) => {
     const filename = path.split("/").pop()?.replace(".json", "") || "";
     const duasArray = mod.default;
     
-    // Validate format
     if (!Array.isArray(duasArray) || (duasArray.length > 0 && !Array.isArray(duasArray[0]))) {
       console.error(`Invalid format in ${filename}. Expected array of arrays.`);
       return {
@@ -135,33 +221,83 @@ const duaCategories: DuaCategory[] = Object.entries(duaModules).map(
     }
     
     return {
-  name: formatNameFromId(filename),
-  duas: duasArray.map((dua: string[]) => ({
-    id: nanoid(),
-    arabic: dua[0],
-    translation: dua[1],
-    reference: dua[2],
-  })),
-};
+      name: formatNameFromId(filename),
+      duas: duasArray.map((item: any[], idx: number) => {
+        if (item.length >= 5 && typeof item[0] === 'string' && typeof item[2] === 'string' && typeof item[4] === 'string') {
+          return {
+            id: nanoid(),
+            arabic: item[0],
+            transliteration: item[1],
+            translation: item[2],
+            wbw: Array.isArray(item[3]) ? item[3] : undefined,
+            reference: item[4],
+          };
+        }
+        else if (item.length >= 3 && typeof item[0] === 'string' && typeof item[1] === 'string' && typeof item[2] === 'string') {
+          return {
+            id: nanoid(),
+            arabic: item[0],
+            translation: item[1],
+            reference: item[2],
+          };
+        }
+        else {
+          console.warn(`Unknown format for dua in ${filename} at index ${idx}`, item);
+          return {
+            id: nanoid(),
+            arabic: "",
+            translation: "",
+            reference: "",
+          };
+        }
+      }),
+    };
   }
 );
 
-// ============= Tajweed API =============
+// ============= API Functions =============
 
 export function getTajweedCategories(): TajweedCategory[] {
-  return tajweedCategories;
+  return tajweedCategoriesFlat;
 }
 
+export function getTajweedCategoryDetail(id: string): TajweedCategoryDetail | undefined {
+  return tajweedCategoryDetails.find(c => c.id === id);
+}
+
+// For backward compatibility: get a flat category (no subfolders)
 export function getTajweedCategory(id: string): TajweedCategory | undefined {
-  return tajweedCategories.find((c) => c.id === id);
+  const detail = getTajweedCategoryDetail(id);
+  if (!detail) return undefined;
+  return {
+    id: detail.id,
+    name: detail.name,
+    arabicName: detail.arabicName,
+    description: detail.description,
+    icon: detail.icon,
+    color: detail.color,
+    subcategories: detail.hasSubfolders ? [] : detail.subcategories,
+  };
 }
 
+// Get a subcategory from a flat category (direct files only)
 export function getTajweedSubcategory(
   categoryId: string,
   subcategoryId: string
 ): TajweedSubcategory | undefined {
   const category = getTajweedCategory(categoryId);
-  return category?.subcategories.find((s) => s.id === subcategoryId);
+  return category?.subcategories.find(s => s.id === subcategoryId);
+}
+
+// Get a subcategory from a subfolder
+export function getTajweedSubfolderSubcategory(
+  categoryId: string,
+  subfolderId: string,
+  subcategoryId: string
+): TajweedSubcategory | undefined {
+  const category = getTajweedCategoryDetail(categoryId);
+  const subfolder = category?.subfolders.find(f => f.id === subfolderId);
+  return subfolder?.subcategories.find(s => s.id === subcategoryId);
 }
 
 // ============= Alphabet API =============

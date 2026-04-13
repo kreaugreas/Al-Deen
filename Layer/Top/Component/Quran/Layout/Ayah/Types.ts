@@ -33,7 +33,6 @@ export interface PageLinesProps {
   showTransliteration?: boolean;
   transliterationFontSize?: string;
   hoverTranslation: string | boolean;
-  // ✅ ADD inline settings
   inlineTranslation: string;
   inlineTransliteration: string;
   inlineTranslationSize: number;
@@ -52,9 +51,43 @@ export interface PageViewProps {
   wordSpacing?: string;
   showTransliteration?: boolean;
   transliterationFontSize?: string;
-  // ✅ ADD inline settings
   inlineTranslation: string;
   inlineTransliteration: string;
   inlineTranslationSize: number;
   inlineTransliterationSize: number;
+}
+
+// Add these interfaces for AyahView and VerseCard
+export interface VerseCardProps {
+  verse: AssembledVerse;
+  surah: SurahMeta;
+  showArabicText: boolean;
+  verseTranslation: string | boolean;
+  translationFontSize: string;
+  transliterationFontSize?: string;
+  showTransliteration?: boolean;
+  isHighlighted: boolean;
+  verseRef: (el: HTMLDivElement | null) => void;
+  onNotesClick: () => void;
+  onShareClick: () => void;
+  onTafsirClick: () => void;           // ✅ NEW
+  hoverTransliteration: string | boolean;
+  inlineTransliteration: string;
+}
+
+export interface AyahViewProps {
+  surah: SurahMeta;
+  verses: AssembledVerse[];
+  showArabicText: boolean;
+  verseTranslation: string | boolean;
+  translationFontSize: string;
+  transliterationFontSize: string;
+  selectedAyahTransliterator: string;
+  targetVerse: string | null;
+  verseRefs: React.MutableRefObject<Map<number, HTMLDivElement>>;
+  onNotesClick: (ayahId: number, verseText: string) => void;
+  onShareClick: (ayahId: number, verseText: string, translation?: string) => void;
+  onTafsirClick: (ayahId: number) => void;   // ✅ NEW
+  hoverTransliteration: string | boolean;
+  inlineTransliteration: string;
 }
